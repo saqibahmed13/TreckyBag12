@@ -1,0 +1,249 @@
+{
+    "TranaslationHub_Label": "Files to translate",
+    "TranaslationHub_Description": "Upload your data and merge it with the backend data to get tranaslation language",
+    "UploadGuidelines": "Upload Guidelines",
+    "TranaslationHub_GUIDELINE_TITLE": "Guidelines for file upload",
+    "DropFiles": [
+        "Drop files here.",
+        "The tool is limited to a maximum of 5 files and 50MB in total size.",
+        "Accepts .txt, .csv, .xlsx, .doc, .docx,  .msg, .pptx, .pdf, .xlf"
+    ],
+    "DropFilesGlossery": [
+        "Drop Glossary file here.",
+        "Accepts .csv"
+    ],
+    "DownloadCsv": "CSV Template",
+    "MaximumFiles": 5,
+    "BrowseFiles": "Browse Files",
+    "NoFiles": "No files uploaded",
+    "Ready": "Ready",
+    "Uploading": "Uploading",
+    "Validated": "Validated",
+    "ErrorValidation": "Error - Continue without file or reupload",
+    "Error": "Error",
+    "ServiceFailed": "There seems to be an error. Please try again after a few minutes.",
+    "UploadFile": "Upload file",
+    "UploadedFile": "Uploaded File",
+    "Submit": "Translate",
+    "DownloadFile": "Download file",
+    "Reset": "Reset",
+    "GoToTranaslationHub": "Continue to Translation Hub",
+    "DownloadGlossaryTemplate": "Download Glossary Template",
+    "GlossaryTemplate": "Glossary Upload",
+    "GlossaryDesc": "** Note using a glossary file will limit you to translating to a single target language",
+    "ChangesSuccessFull": "Changes successful",
+    "SavedSuccess": "Saved Successfully",
+    "DataModelling_Label": "Tranaslation Hub",
+    "DataModelling_Description": "We have automatically highlighted matching column names for you. To make changes, select two columns and click “Add New”, or choose one column and click “Remove”",
+    "EditRelation": "Edit Relationships",
+    "ERDiagram": "ER Diagram",
+    "AutoMatch": "Auto-Match",
+    "Exact": "Exact",
+    "Loose": "Loose",
+    "Selected": "selected",
+    "AddNew": "Add New",
+    "Remove": "Remove",
+    "Match": "Match",
+    "Done": "Done",
+    "Download": "Download",
+    "ERPlaceHolder": "Generating ER Diagram",
+    "MaximumFilesName": "Maximum Files",
+    "TranaslationHubLungage": [
+        {
+            "key": "sq",
+            "value": "Albanian"
+        },
+        {
+            "key": "ar",
+            "value": "Arabic"
+        },
+        {
+            "key": "bs",
+            "value": "Bosnian"
+        },
+        {
+            "key": "et",
+            "value": "Estonian"
+        },
+        {
+            "key": "bg",
+            "value": "Bulgarian"
+        },
+        {
+            "key": "zh-Hans",
+            "value": "Chinese (Simplified)"
+        },
+        {
+            "key": "zh-Hant",
+            "value": "Chinese (Traditional)"
+        },
+        {
+            "key": "hr",
+            "value": "Croatian"
+        },
+        {
+            "key": "cs",
+            "value": "Czech"
+        },
+        {
+            "key": "da",
+            "value": "Danish"
+        },
+        {
+            "key": "nl",
+            "value": "Dutch"
+        },
+        {
+            "key": "en",
+            "value": "English"
+        },
+        {
+            "key": "fi",
+            "value": "Finnish"
+        },
+        {
+            "key": "fr",
+            "value": "French"
+        },
+        {
+            "key": "fr-ca",
+            "value": "French (Canada)"
+        },
+        {
+            "key": "tl",
+            "value": "Filipino"
+        },
+        {
+            "key": "de",
+            "value": "German"
+        },
+        {
+            "key": "el",
+            "value": "Greek"
+        },
+        {
+            "key": "gu",
+            "value": "Gujarati"
+        },
+        {
+            "key": "hi",
+            "value": "Hindi"
+        },
+        {
+            "key": "hu",
+            "value": "Hungarian"
+        },
+        {
+            "key": "it",
+            "value": "Italian"
+        },
+        {
+            "key": "ja",
+            "value": "Japanese"
+        },
+        {
+            "key": "kn",
+            "value": "Kannada"
+        },
+        {
+            "key": "ko",
+            "value": "Korean"
+        },
+        {
+            "key": "lv",
+            "value": "Latvian"
+        },
+        {
+            "key": "lt",
+            "value": "Lithuanian"
+        },
+        {
+            "key": "ms",
+            "value": "Malay"
+        },
+        {
+            "key": "mr",
+            "value": "Marathi"
+        },
+        {
+            "key": "mi",
+            "value": "Maori"
+        },
+        {
+            "key": "no",
+            "value": "Norwegian"
+        },
+        {
+            "key": "pl",
+            "value": "Polish"
+        },
+        {
+            "key": "pt",
+            "value": "Portuguese (Brazil)"
+        },
+        {
+            "key": "pt-pt",
+            "value": "Portuguese (Portugal)"
+        },
+        {
+            "key": "ro",
+            "value": "Romanian"
+        },
+        {
+            "key": "ru",
+            "value": "Russian"
+        },
+        {
+            "key": "sr",
+            "value": "Serbian"
+        },
+        {
+            "key": "sm",
+            "value": "Samoan"
+        },
+        {
+            "key": "sk",
+            "value": "Slovak"
+        },
+        {
+            "key": "sl",
+            "value": "Slovene"
+        },
+        {
+            "key": "es",
+            "value": "Spanish"
+        },
+        {
+            "key": "sv",
+            "value": "Swedish"
+        },
+        {
+            "key": "to",
+            "value": "Tongan              "
+        },
+        {
+            "key": "ta",
+            "value": "Tamil"
+        },
+        {
+            "key": "te",
+            "value": "Telugu"
+        },
+        {
+            "key": "th",
+            "value": "Thai"
+        },
+        {
+            "key": "tr",
+            "value": "Turkish"
+        },
+        {
+            "key": "uk",
+            "value": "Ukrainian"
+        },
+        {
+            "key": "vi",
+            "value": "Vietnamese"
+        }
+    ]
+}

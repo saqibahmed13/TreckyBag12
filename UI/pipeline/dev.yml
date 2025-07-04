@@ -1,0 +1,5 @@
+variables:
+  azureSubscription: 'EmTech_ChatViatris_Dev'
+  resourceGroupName: 'emtech-emt-itapp-d2-rg-ngxp-dev'
+  WebAppName: 'emtfrt-emt-itapp-d2-wa-ngxp-dev'
+  REACT_APP_GUARDRAIL_URL: 'https://emtgrd-emt-itapp-d2-wa-ngxp-dev.azurewebsites.net/'

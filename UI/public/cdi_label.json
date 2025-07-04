@@ -1,0 +1,121 @@
+{
+  "CHAT_LABEL": "Chat Data Q&A",
+  "DASHBOARD_LABEL": "Dashboard  >  Chat Data Insights ",
+  "CHAT_SECTION_LABEL": "Chat Data Q&A",
+  "TRANASLATION_HUB_LABEL": "File Upload",
+  "CHAT_DESC": "Chat Data Insights is an AI-powered chatbot that provides quick answers and generates relevant charts based on structured data.  The tool can find answers to specific questions about the data as well as identify patterns and other summary information from the underlying structured data.",
+  "DISCOVER_LABEL": "Discover",
+  "INSIGHTS_LABEL": "Insights",
+  "MODELLING_LABEL": "Data Upload & Modeling",
+  "Discover": {
+    "Discover_Label": "Discover",
+    "Discover_Description": "Explore and visualize data through high-level charts, with the option to customize topics and chart rules.",
+    "ExampleQuestion": "Example Questions",
+    "QuestionTitle": "describe what you want to explore",
+    "RulesTitle": "ADD RULES",
+    "RulesPlaceHolder": "Create diversified charts, focus on all tables",
+    "ChartTitle": "Chart Type",
+    "VisualizationsTitle": "# Visualizations",
+    "MaxVisualisation": 10,
+    "DiscoverCharts": [
+      "Bar",
+      "Line",
+      "Scatter",
+      "Area",
+      "Bubble",
+      "Pie"
+    ],
+    "GenerateResults": "Generate Results",
+    "GeneratingChart": "Generating Charts...",
+    "ServiceFailed": "There seems to be an error. Please try again after a few minutes.",
+    "InsightsResults": "Insights",
+    "Reasoning": "Reasoning",
+    "CodeQuery": "SQL query",
+    "Copy": "Copy",
+    "Download": "Download",
+    "GoBackToInputScreen": "Go Back"
+  },
+  "Insights": {
+    "Insights_Label": "Data Insights",
+    "Insights_Description": "Explore high-level insights on the data, narrow down exploration using the ‘Ask question’ feature.",
+    "ExampleQuestion": "Example Questions",
+    "QuestionTitle": "ASK question",
+    "GenerateResults": "Generate Insights",
+    "ServiceFailed": "There seems to be an error. Please try again after a few minutes.",
+    "GoBackToInputScreen": "Go Back",
+    "InsightsResults": "Insights",
+    "Copy": "Copy",
+    "Download": "Download"
+  },
+  "Modelling": {
+    "DataUpload_Label": "Data Upload",
+    "DataUpload_Description": "Upload your data and merge it with the backend data to get comprehensive insights.",
+    "UploadGuidelines": "Upload Guidelines",
+    "UPLOAD_GUIDELINE_TITLE": "Guidelines for file upload",
+    "DropFiles": [
+      "Drop files here.",
+      "Limited to 3 datasets, 50MB max file size each.",
+      "Max 20 columns per dataset.",
+      "Accepts .csv, .xlsx."
+    ],
+    "MaximumFiles": 3,
+    "BrowseFiles": "Browse Files",
+    "Uploads": "Uploads",
+    "NoFiles": "No files uploaded",
+    "Ready": "Ready",
+    "Uploading": "Uploading",
+    "Validated": "Validated",
+    "ErrorValidation": "Error - Continue without file or reupload",
+    "Error": "Error",
+    "ServiceFailed": "There seems to be an error. Please try again after a few minutes.",
+    "UploadDataSet": "Validate Dataset",
+    "Reset": "Reset",
+    "GoToDataModelling": "Continue to Data Modelling",
+    "FILE_TYPE": {
+      "EXCEL FILE": [
+        "Every sheet should contain one and only one structured data in tabular manner",
+        "Table in the individual sheets should not be directly adjacent to other cells which has values filled in it, if it exist you can delete the direct adjacent cells before upload, so that the tool can detect the correct table positions automatically",
+        "Column name should not duplicate itself in the same table, although duplicated column name is allowed across different tables",
+        "Column name should not have duplicates",
+        "Column name should not contain trailing and leading spaces"
+      ],
+      "CSV FILE": [
+        "Check that it’s a comma separated csv",
+        "Column name should not have duplicates",
+        "Column name should not contain trailing and leading spaces"
+      ]
+    },
+    "ChangesSuccessFull": "Changes successful",
+    "SavedSuccess": "Saved Successfully",
+    "DataModelling_Label": "Data Modeling",
+    "DataModelling_Description": "We have automatically highlighted matching column names for you. To make changes, select two columns and click “Add New”, or choose one column and click “Remove”",
+    "EditRelation": "Edit Relationships",
+    "ERDiagram": "ER Diagram",
+    "AutoMatch": "Auto-Match",
+    "Exact": "Exact",
+    "Loose": "Loose",
+    "Selected": "selected",
+    "AddNew": "Add New",
+    "Remove": "Remove",
+    "Match": "Match",
+    "Done": "Done",
+    "Download": "Download",
+    "ERPlaceHolder": "Generating ER Diagram"
+  },
+  "Sidebar": {
+    "AdvMode": "Adv Mode"
+  },
+  "AUTO_REPLACE_REF": [
+    {
+      "ELEMENT": "[contact email hyperlink]",
+      "TYPE": "HYPERLINK",
+      "REDIRECT_LINK": "mailto:Ryan.Meyer@viatris.com",
+      "DISPLAY_TEXT": "Ryan.Meyer@viatris.com"
+    },
+    {
+      "ELEMENT": "[contact name]",
+      "TYPE": "TEXT",
+      "REPLACE_WITH": "Ryan Meyer"
+    }
+  ]
+}

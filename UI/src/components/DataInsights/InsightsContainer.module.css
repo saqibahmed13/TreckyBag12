@@ -1,0 +1,63 @@
+.sidebar {
+  background-color: #ffffff;
+  height: 100%;
+  z-index: 100;
+  padding-top: 10px;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+}
+
+.menu li {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+}
+
+.menu li:hover {
+  background-color: #ccc;
+}
+
+.footer {
+  padding: 10px;
+  width: "100px";
+  text-align: center;
+}
+
+.insightsBox {
+  width: 95vw;
+  background: #fff;
+  pointer-events: auto;
+  transform: scale(1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.insightsInputBox {
+  width: 100%;
+  background: #fff;
+  overflow-y: auto;
+  pointer-events: auto;
+  transform: scale(1);
+  height: 100%;
+}
+
+.gridItem {  
+  position: 'relative'; 
+  padding-top: '100%';
+  flex-direction: row;
+  overflow: 'hidden'; 
+  justify-content: space-between; 
+  height: auto;
+}
+
+.image {  
+  top: 0;
+  left: 0;
+  width: 100%;
+  flex-grow: 1;
+} 

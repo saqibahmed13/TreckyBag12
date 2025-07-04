@@ -1,0 +1,66 @@
+trigger: 
+  none
+
+pr: 
+  none
+
+name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+resources:
+  pipelines:
+    - pipeline: Build
+      source: 'application_pipeline/UI_Build'
+
+parameters:
+  - name: ring
+    displayName: Select Environment
+    default: poc
+    values:
+      - poc
+      - dev
+      - qa
+      - prod
+
+variables:
+  - template: '../${{ parameters.ring }}.yml'
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: 'Release_${{ parameters.ring }}'
+    displayName: 'Release ${{ parameters.ring }}'      
+
+    #condition: and(or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startswith(variables['Build.SourceBranch'], 'refs/heads/release'), startswith(variables['Build.SourceBranch'], 'refs/heads/bug')), and(succeeded(), eq(variables.enabled, 'true')))
+    jobs:
+      - deployment: 'Deploy_${{ parameters.ring }}'
+        displayName: 'Deploy: ${{ parameters.ring }}'
+        environment: 'Emtech-GenAI-${{ parameters.ring }}'
+        strategy:
+          runOnce:
+            deploy:
+              steps:              
+              - task: AzureAppServiceSettings@1
+                inputs:
+                  appName: $(WebAppName)
+                  azureSubscription: $(azureSubscription)
+                  resourceGroupName: $(resourceGroupName)
+                  appSettings: |
+                    [
+                      {
+                        "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                        "value": "true",
+                        "slotSetting": false
+                       },
+                      {
+                        "name": "REACT_APP_GUARDRAIL_URL",
+                        "value": "$(REACT_APP_GUARDRAIL_URL)",
+                        "slotSetting": false
+                       }
+                    ]
+              - task: AzureRmWebAppDeployment@4
+                inputs:
+                  ConnectionType: 'AzureRM'
+                  azureSubscription: $(azureSubscription)
+                  appType: 'webAppLinux'
+                  WebAppName: $(WebAppName)
+                  packageForLinux: '$(Pipeline.Workspace)/Build/drop/'

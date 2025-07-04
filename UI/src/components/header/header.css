@@ -1,0 +1,105 @@
+
+.sidebar.close~.navbar {
+    left: 0;
+    width: 100%;
+}
+
+.navbar {
+    position: fixed;
+    color: #2d2d2d;
+    padding: 5px 22px;
+    font-size: 25px;
+    cursor: default;
+    background: #fff;
+    box-shadow: 0px 4px 5px 0px rgba(153, 130, 171, 0.14);
+}
+
+.navbar #sidebar-close {
+    cursor: pointer;
+    float: right;
+    margin-top: 15px;
+}
+
+.navbar {
+    width: 100%;
+    transition: all 0.5s ease;
+    z-index: 9999;
+}
+nav.navbar img {
+    transform: scale(0.8);
+    margin-top: 5px;
+}
+
+h2 {
+    display: inline-block;
+    padding-left: 5px;
+    font-weight: 400;
+    font-size: 18px;
+    position: relative;
+    top: -8px;
+    color: #703E97;
+}
+
+.h2-span {
+    color: #703E97;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+    display: inline-block;
+    position: relative;
+    top: -10px;
+    left: 5px;
+}
+
+.session.name {
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    width: 100%;
+    color: #703E97;
+    font-size: 20px;
+    font-weight: 700;
+    z-index: -1;
+    line-height: 33px;
+}
+
+.user {
+    font-size: 12px;
+    background: #703E97;
+    border-radius: 100%;
+    height: 32px;
+    width: 32px;
+    line-height: 32px;
+    text-align: center;
+    margin-left: 10px;
+    font-weight: 700;
+    color: #fff;
+    position: absolute;
+    right: 60px;
+    top: 10px;
+}
+
+.domain-cont {
+    border: none;
+    width: 100%;
+    margin-top: 55px;
+    text-align: center;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #E6E6E6;
+}
+
+.user-guide {
+    height: 32px;
+    width: 32px;
+    position: absolute;
+    top: 6px;
+    right: 180px;
+    overflow: hidden;
+}
+
+.user-guide img {
+    width: 100%;
+    cursor: pointer;
+}

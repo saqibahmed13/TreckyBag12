@@ -1,0 +1,39 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - UATBranch
+      - release/*
+    exclude:
+      - feature/*
+resources:
+  repositories:
+    - repository: self
+      type: git
+
+name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+
+variables:
+  - name: default_vmImage
+    value: ubuntu-22.04
+  - name: projectRoot
+    value: $(System.DefaultWorkingDirectory)
+
+pool:
+  vmImage: $(default_vmImage)
+
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - job: Build_React_App
+        displayName: Build_React_App
+        steps:        
+        - task: PublishBuildArtifacts@1
+          displayName: $(Build.BuildId)
+          inputs:
+            PathtoPublish: $(projectRoot)
+            ArtifactName: 'drop'
+            publishLocation: 'Container'

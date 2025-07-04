@@ -1,0 +1,53 @@
+/* Style the list */
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+}
+
+/* Display list items side by side */
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+}
+
+/* Add a slash symbol (/) before/behind each list item */
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: #9982AB;
+  font-size: 14px;
+  content: ">";
+}
+
+/* Add a color to all links inside the list */
+ul.breadcrumb li a {
+  color: #9982AB;
+  text-align: center;
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Open Sans;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+  text-decoration: none;
+  
+}
+
+ul.breadcrumb li a.active {
+  color: #2A276E;
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Open Sans;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+}
+
+ul.breadcrumb li a:hover{
+  text-decoration: underline;
+}
+
+ul.breadcrumb li a.disable{
+  pointer-events: none;
+}

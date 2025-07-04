@@ -1,0 +1,321 @@
+.dashboard-overlay {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #fff;
+    z-index: 9991;
+    top: 55px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.dashboard-inner-wrapper {
+    width: 55%;
+    margin: auto;
+    text-align: center;
+    height: 80vh;
+    overflow: hidden;
+}
+
+.dashboard-inner-wrapper .menu-row {
+    border-radius: 8px;
+    border: 1px solid #9982AB;
+    background: #FFF;
+    box-shadow: 0px 4px 6px 0px rgba(153, 130, 171, 0.30);
+    cursor: pointer;
+    text-align: left;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+}
+
+.dashboard-inner-wrapper .menu-row .icon {
+    float: left;
+    padding-top: 5px;
+    display: grid;
+}
+
+.dashboard-inner-wrapper .menu-row .desc {
+    padding: 10px;
+    display: grid;
+}
+
+.dashboard-inner-wrapper img {
+    transform: scale(0.6);
+}
+
+.dashboard-inner-wrapper p.name {
+    color: #2A276E;
+    font-family: Open Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.dashboard-inner-wrapper p.dsc {
+    color: #474747;
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+
+.dashboard-inner-wrapper h1 {
+    color: #2A276E;
+    font-family: Open Sans;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    margin-bottom: 11px;
+}
+
+.dashboard-inner-wrapper h3 {
+    color: #703E97;
+    font-family: Open Sans;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 1.105px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+}
+
+.dashboard-top-wrapper {
+    margin-top: 60px;
+}
+
+.dahboard-menu-wrapper {
+    height: calc(100% - 185px);
+    overflow: auto;
+    padding: 0 15px;
+}
+
+.footer-wrapper {
+    position: absolute;
+    width: 100%;
+    bottom: 50px;
+    height: 12vh;
+    overflow: hidden;
+}
+
+.footer-wrapper .footer {
+    width: 55%;
+}
+
+.dashboard-inner-wrapper .footer {
+    color: #474747;
+    width: 60%;
+    margin: auto;
+    font-size: 11px;
+    position: absolute;
+    bottom: 80px;
+    width: 45%;
+}
+
+.dashboard-overlay .divider {
+    height: 1px;
+    width: 85%;
+    background: rgba(153, 130, 171, 0.50);
+    margin: 20px auto;
+}
+
+.dahboard-menu-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dahboard-menu-wrapper::-webkit-scrollbar-track {
+    border-radius: 3px;
+    background: #9982AB4D;
+}
+
+.dahboard-menu-wrapper::-webkit-scrollbar-thumb {
+    background: #9982AB;
+    border-radius: 3px;
+}
+
+/* ======== Responsive Styles ======== */
+
+/* 📱 Mobile: Portrait Mode (Max 480px) */
+@media screen and (max-width: 480px) {
+    .dashboard-inner-wrapper {
+        width: 90% !important;
+        height: auto;
+        margin-top: 10px;
+    }
+
+    .dashboard-inner-wrapper .menu-row {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .dashboard-inner-wrapper img {
+        transform: scale(0.8);
+    }
+
+    .dashboard-inner-wrapper h1 {
+        font-size: 24px;
+    }
+
+    .dashboard-inner-wrapper h3 {
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-inner-wrapper p.name {
+        font-size: 16px;
+    }
+
+    .dashboard-inner-wrapper p.dsc {
+        font-size: 12px;
+        line-height: 20px;
+    }
+
+    .dashboard-top-wrapper {
+        margin-top: 2% !important;
+    }
+
+    .dahboard-menu-wrapper {
+        height: calc(100% - 100px);
+        overflow: auto;
+        padding: 0 15px;
+    }
+
+    .footer-wrapper {
+        display: none !important;
+    }
+
+}
+
+/* 📱 Mobile: Landscape Mode (481px - 767px) */
+@media screen and (max-width: 767px) and (orientation: landscape) {
+    .dashboard-inner-wrapper {
+        width: 90% !important;
+        height: 70vh;
+    }
+
+    .dashboard-inner-wrapper .menu-row {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .dashboard-inner-wrapper img {
+        transform: scale(0.7);
+    }
+
+
+    .dashboard-top-wrapper {
+        margin-top: 2% !important;
+    }
+
+    .dahboard-menu-wrapper {
+        height: calc(100% - 100px);
+        overflow: auto;
+        padding: 0 15px;
+    }
+
+    .footer-wrapper {
+        bottom: 20px;
+        height: 8vh;
+    }
+}
+
+/* 📲 Tablet: Portrait Mode (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+    .dashboard-inner-wrapper {
+        width: 90% !important;
+    }
+
+    .dashboard-inner-wrapper h1 {
+        font-size: 30px;
+    }
+
+    .dashboard-inner-wrapper h3 {
+        font-size: 14px;
+    }
+
+    .dashboard-inner-wrapper img {
+        transform: scale(0.8);
+    }
+
+    .dashboard-top-wrapper {
+        margin-top: 2% !important;
+    }
+
+    .dahboard-menu-wrapper {
+        height: calc(100% - 100px);
+        overflow: auto;
+        padding: 0 15px;
+    }
+
+    .footer-wrapper {
+        bottom: 20px;
+        height: 8vh;
+    }
+}
+
+
+@media screen and (max-width: 1024px) {
+    .dashboard-inner-wrapper {
+        width: 90% !important;
+    }
+
+    .chathistory {
+        width: 30% !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+    }
+
+    .translationHubBox {
+        width: 70% !important;
+    }
+
+    .btn-container {
+        padding: 0px !important;
+    }
+
+    .show-hide-history {
+        display: none !important;
+    }
+
+    .prompt-i-w {
+        width: 95% !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard-inner-wrapper {
+        width: 90% !important;
+    }
+
+    .chathistory {
+        width: 30% !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+    }
+
+    .translationHubBox {
+        width: 70% !important;
+    }
+
+    .btn-container {
+        padding: 0px !important;
+    }
+
+    .show-hide-history {
+        display: none !important;
+    }
+
+    .prompt-i-w {
+        width: 95% !important;
+    }
+}

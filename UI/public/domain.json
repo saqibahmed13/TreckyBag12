@@ -1,0 +1,45 @@
+{
+    "CHAT_LABEL": "_UI_[use case]_COMMON_CHAT_LABEL",
+    "DASHBOARD_LABEL": "_UI_COMMON_DASHBOARD_TEXT",
+    "CHAT_DESC": "_UI_[use case]_[instance short name]_CHAT_LONG_DESCRIPTION",
+    "PROMPT": "_UI_[use case]_[instance short name]_PROMPT",
+    "UC_DASHBOARD_LABEL": "_UI_[use case]_COMMON_DASHBOARD_TEXT",
+    "ExampleQuestionDiscover": "_UI_[use case]_[instance short name]_DISCOVERQUESTIONS",
+    "ExampleQuestionInsight": "_UI_[use case]_[instance short name]_INSIGHTQUESTIONS",
+    "IrrevalantQuestion": "_UI_[use case]_[instance short name]_IRREVALANTQUESTION",
+    "AUTO_REPLACE_REF": [
+        {
+            "ELEMENT": "[contact email hyperlink]",
+            "TYPE": "HYPERLINK",
+            "REDIRECT_LINK": "_UI_[use case]_[instance short name]_CONTACT_EMAIL_LINK",
+            "DISPLAY_TEXT": "_UI_[use case]_[instance short name]_CONTACT_EMAIL_TEXT"
+        },
+        {
+            "ELEMENT": "[HYPER LINK]",
+            "TYPE": "HYPERLINK_CHAT",
+            "REDIRECT_LINK": "_UI_[use case]_[instance short name]_CHAT_HYPERLINK",
+            "DISPLAY_TEXT": "_UI_[use case]_[instance short name]_CHAT_HYPERLINK_TEXT"
+        },
+        {
+            "ELEMENT": "[MAIL ID]",
+            "TYPE": "HYPERLINK_MAIL",
+            "REDIRECT_LINK": "_UI_[use case]_[instance short name]_CHAT_MAIL_ID",
+            "DISPLAY_TEXT": "_UI_[use case]_[instance short name]_CHAT_MAIL_TEXT"
+        },
+        {
+            "ELEMENT": "[contact name]",
+            "TYPE": "TEXT",
+            "REPLACE_WITH": "_UI_[use case]_[instance short name]_CONTACT_NAME"
+        },
+        {
+            "ELEMENT": "[use case]",
+            "TYPE": "VARIABLE",
+            "REF": "USECASE"
+        },
+        {
+            "ELEMENT": "[instance short name]",
+            "TYPE": "VARIABLE",
+            "REF": "DOMAIN"
+        }
+    ]
+}

@@ -1,0 +1,150 @@
+.translationHubBox {
+    width: calc(100% - 40px);
+    background: #fff;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: all 0.1s ease;
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+    height: 100%;
+}
+
+.hubBox {
+    /* width: 95vw !important; */
+    background: #fff;
+    pointer-events: auto;
+    transform: scale(1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 300px;
+    padding: 20px 0;
+    background-color: #F3F3F3;
+    box-shadow: 0 5px 1px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+}
+
+
+.footer {
+    padding: 10px;
+    width: "100px";
+    text-align: center;
+}
+
+
+.image {
+    top: 0;
+    left: 0;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.hubBox .css-rb60he {
+    margin: 0.5% !important;
+}
+
+.hubBox .css-rb60he .css-hbfdmr {
+    padding: 11px !important;
+    height: 200px !important;
+}
+
+.formControlData {
+    display: inline-flex !important;
+}
+
+.btnUploadData {
+    display: contents !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.tableHeadData {
+    margin: 0px !important;
+}
+
+.marginLeftTable {
+    margin-left: 5% !important;
+}
+
+.marginTopAlign {
+    margin-top: 1% !important;
+}
+
+.fullWidth {
+    /* width: 100% !important; */
+    width: 350px !important;
+    margin: 10px 0px !important;
+}
+
+.hubBoxContent {
+    padding: 11px !important;
+    height: auto !important;
+    width: 80% !important;
+    background-color: #f0e9f4 !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    border: 1px solid black !important;
+    margin: auto !important;
+}
+
+.WidthAlignment div div div div {
+    top: 0px !important;
+    left: 0px !important;
+    width: 350px !important;
+}
+
+
+.cellWidthSizeFile {
+    width: 40% !important;
+}
+
+.cellWidthSizeLang {
+    width: 20% !important;
+}
+
+.hideShowNewChat {
+    display: none !important;
+    text-align: center;
+}
+
+
+@media screen and (max-width: 767px) {
+    .translationHubBox {
+        width: 100% !important;
+    }
+
+    .hideShowNewChat {
+        display: block !important;
+        text-align: center;
+    }
+
+    p.css-csb2m5-MuiTypography-root {
+        font-size: 10px !important;
+    }
+
+    .hubBoxContent P {
+        font-size: 12px !important;
+    }
+
+    .textAlegnmentData {
+        font-size: 12px !important;
+    }
+
+    p.css-1dfztxx-MuiTypography-root {
+        font-size: 12px !important;
+    }
+}
+
+.floatRightAlignmentBtn {
+    display: flex !important;
+    justify-content: flex-end;
+    align-items: center;
+}

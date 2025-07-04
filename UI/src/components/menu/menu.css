@@ -1,0 +1,104 @@
+.menu-drop-down {
+  display: inline-block;
+  position: absolute;
+  right: 110px;
+  top: 6px;
+}
+
+.menu-drop-down .css-jznujr-ContentComponent {
+  color: #2A276E;
+  font-family: Open Sans;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  align-self: center;
+  display: inline-block;
+}
+
+.menu-drop-down .css-z2hyoe-ItemComponent {
+  color: var(--text-body, #474747);
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Open Sans;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.4px;
+}
+
+.menu-drop-down .css-wmy1p7-ReactDropdownSelect {
+  border-radius: 4px;
+  border: none !important;
+  background: #FFF;
+  box-shadow: none;
+  box-sizing: content-box;
+  width: auto;
+}
+
+.menu-drop-down .css-wmy1p7-ReactDropdownSelect:hover,
+.menu-drop-down .css-wmy1p7-ReactDropdownSelect:focus-within {
+  border: 1px solid #9982AB;
+}
+
+.menu-drop-down .css-z2hyoe-ItemComponent:hover,
+.css-z2hyoe-ItemComponent:focus {
+  border-radius: 4px;
+  background: var(--neutral-01, #F3F3F3);
+  color: #703E97;
+  font-weight: 700;
+}
+
+.menu-drop-down .css-z2hyoe-ItemComponent.react-dropdown-select-item-selected {
+  background: #9982AB;
+  color: #FFF;
+}
+
+.menu-drop-down .css-wmy1p7-ReactDropdownSelect * {
+  text-transform: none !important;
+  /* width: auto; */
+}
+
+.menu-drop-down .css-c91z-NoDataComponent {
+  color: inherit;
+}
+
+.menu-drop-down .css-z532jj-InputComponent {
+  display: none;
+}
+
+.menu-drop-down .react-dropdown-select-dropdown.react-dropdown-select-dropdown-position-bottom {
+  width: 200px;
+  left: auto;
+  right: 0;
+  border-radius: 4px;
+  background: #FFF;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.25);
+  top: 40px;
+  padding: 10px 8px;
+}
+
+.menu-drop-down .react-dropdown-select-dropdown-handle svg {
+  position: relative;
+  top: -4px;
+}
+
+.menu-drop-down input.react-dropdown-select-input {
+  color: #2A276E;
+  font-feature-settings: 'clig' off, 'liga' off;
+  font-family: Open Sans;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.menu-drop-down ::placeholder,
+.menu-drop-down .react-dropdown-select-dropdown-handle {
+  color: #2A276E;
+}
+
+.menu-drop-down .react-dropdown-select:focus,
+.menu-drop-down .react-dropdown-select:focus-within {
+  box-shadow: none;
+}

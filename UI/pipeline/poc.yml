@@ -1,0 +1,5 @@
+variables:
+  azureSubscription: 'IT-EmTech-GenAIAccelerator'
+  resourceGroupName: 'rg-emtech-genaiaccelerator'
+  WebAppName: 'chatviatris-pilot'
+  REACT_APP_GUARDRAIL_URL: 'https://emtech-wa-guardrail-all-poc.azurewebsites.net/'

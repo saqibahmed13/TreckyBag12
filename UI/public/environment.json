@@ -1,0 +1,51 @@
+{
+    "BASE_URL": "https://emtech-wabackend-css-all-poc.azurewebsites.net",
+    "SHOW_UPLOAD": "_UI_[use case]_COMMON_SHOULD_UPLOAD",
+    "SHOW_DOWNLOAD": "_UI_[use case]_COMMON_SHOULD_DOWNLOAD",
+    "SHOW_DOC_REFERENCE": "_UI_[use case]_COMMON_SHOW_DOC_REFERENCE",
+    "SHOW_SIDEBAR": "_UI_[use case]_COMMON_SHOW_SIDEBAR",
+    "SHOW_IMAGE": "_UI_[use case]_COMMON_SHOW_IMAGE",
+    "SHOW_CODE": "_UI_[use case]_COMMON_SHOW_CODE",
+    "SHOW_ADVMODE": "_UI_[use case]_COMMON_SHOW_ADVMODE",
+    "BASICMODEOPTIONS": "_UI_[use case]_COMMON_BASIC_OPTIONS",
+    "ADVMODEOPTIONS": "_UI_[use case]_COMMON_ADV_OPTIONS",
+    "ALLIAS": "_UI_[use case]_[instance short name]_ALIAS_NAME",
+    "AUTO_REPLACE_REF": [
+        {
+            "ELEMENT": "[contact email hyperlink]",
+            "TYPE": "HYPERLINK",
+            "REDIRECT_LINK": "_UI_[use case]_COMMON_CONTACT_EMAIL_LINK",
+            "DISPLAY_TEXT": "_UI_[use case]_COMMON_CONTACT_EMAIL_TEXT"
+        },
+        {
+            "ELEMENT": "[HYPER LINK]",
+            "TYPE": "HYPERLINK_CHAT",
+            "REDIRECT_LINK": "_UI_[use case]_COMMON_CHAT_HYPERLINK",
+            "DISPLAY_TEXT": "_UI_[use case]_COMMON_CHAT_HYPERLINK_TEXT"
+        },
+        {
+            "ELEMENT": "[MAIL ID]",
+            "TYPE": "HYPERLINK_MAIL",
+            "REDIRECT_LINK": "_UI_[use case]_COMMON_CHAT_MAIL_ID",
+            "DISPLAY_TEXT": "_UI_[use case]_COMMON_CHAT_MAIL_TEXT"
+        },
+        {
+            "ELEMENT": "[contact name]",
+            "TYPE": "TEXT",
+            "REPLACE_WITH": "_UI_[use case]_COMMON_CONTACT_NAME"
+        },
+        {
+            "ELEMENT": "[use case]",
+            "TYPE": "VARIABLE",
+            "REF": "USECASE"
+        },
+        {
+            "ELEMENT": "[instance short name]",
+            "TYPE": "VARIABLE",
+            "REF": "DOMAIN"
+        }
+    ],
+    "GROUPBY": "true",
+    "AUTH": "true",
+    "DELETE": "true"
+}

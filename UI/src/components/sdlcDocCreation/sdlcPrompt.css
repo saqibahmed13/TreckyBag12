@@ -1,0 +1,9 @@
+div.prompt-wrapper div.prompt-i-w div.prompt-desc-cont div.prompt-inner-wrapper div.desc ul {
+    position: relative !important;
+}
+ 
+div.prompt-wrapper .prompt-i-w ul {
+    position: relative !important;
+    bottom: 0;
+    width: 100%;
+}
