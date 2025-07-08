@@ -994,6 +994,8 @@ function App() {
     )
   }
 
+  
+
   //POST: Add a session using FormData
 //   const addNewSessionSDLC = (callback) => {
 //   const formData = new FormData();
@@ -1218,6 +1220,9 @@ const renameSessionSDLC = (session_name, thesessionID) => {
   formData.append("user_email", userEmail);
   formData.append("domain", domain);
   formData.append("session_id", thesessionID);
+  console.log("userEmailDelete",userEmail)
+  console.log("session_idDelete", thesessionID)
+  console.log("domainDelete", domain)
 
   API.DELETE(
     baseURL,
@@ -2051,8 +2056,8 @@ const renameSessionSDLC = (session_name, thesessionID) => {
                    {(!(config?.sideBar ?? false) && USECASE == "sdlc") &&
                                       <>
                                         {/* <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory> */}
-                                         <ChatHistory  sessionList={sessionList} showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} userEmail={userEmail} thesessionID={thesessionID}></ChatHistory>
-                                         <SDLCChat    sessionChatPath={sessionChatURL} setSessionList={setSessionList} config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} showHistory={showHistory} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSessionSDLC} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} thesessionID={thesessionID} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} getName={getSessionsSDLC}></SDLCChat> 
+                                         <ChatHistory setSessionList={setSessionList} sessionList={sessionList} showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} userEmail={userEmail} thesessionID={thesessionID} domain={domain}></ChatHistory>
+                                         <SDLCChat    sessionChatPath={sessionChatURL} setSessionList={setSessionList} config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} showHistory={showHistory} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSessionSDLC} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} thesessionID={thesessionID} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} getName={getSessionsSDLC} ></SDLCChat> 
                                       </>
                                     }
                 </Box>
