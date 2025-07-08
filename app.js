@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './App.css';
 import Header from "./components/header/header";
@@ -19,15 +19,15 @@ import DataModelling from './components/DataInsights/DataModelling';
 import DataInsightsProvider from "./components/DataInsights/DataInsightsContext";
 import TranaslationHub from './components/tranaslationHub/tranaslationHub';
 import TranaslationHubHistory from './components/tranaslationHub/tranaslationHubHistory';
-import SDLCChat from "./components/sdlcDocCreation/sdlcChat";
-import SDLCChatHistory from "./components/sdlcDocCreation/sdlcChatHistory"
 // import SupportBotChat from './components/supportBots/supportBotChats';
 // import SupportBotVoice from './components/supportBots/supportBotVoices';
 import API from "./utils/api.service";
 import { setSasToken } from "./components/DataInsights/Utility/Util";
 import APPSERVICE from "./utils/appservice";
-import { get } from "jquery";
- 
+import SDLCChat from "./components/sdlcDocCreation/sdlcChat";
+import SDLCChatHistory from "./components/sdlcDocCreation/sdlcChatHistory"
+
+
 let sessionID = null;
 let sessionIndex = 0;
 let baseURL = '';
@@ -39,18 +39,17 @@ let dataPrivacyURL = ''
 let prodMode = (window.location.hostname !== "localhost"); //PRODUCTION CHECK
 let getGlobalConfigResponse = {};
 let getHubSessionId = null;
-let getSDLCSessionId = null;
 let getFileUploadedData = [];
 let getFileUploadedGlossaryData = '';
 let formDataSet = {};
 let getTranaslationUloadedFile = [];
 let getMetaTagValue = [];
- 
+
 function App() {
   const getURIDetails = () => {
     const useCase = window.location.pathname.split('/')[1];
     const domain = new URLSearchParams(window.location.search).get('domain');
- 
+
     if (!useCase.length && domain == null) {
       loadDashboard = true;
       return false;
@@ -69,7 +68,7 @@ function App() {
       }
     }
   }
- 
+
   //USECASE, DOMAIN will be passed through query string. Like, http://localhost:3000/cas?domain=hr
   const getURI = getURIDetails()
   const USECASE = getURI ? getURI.USECASE : '';
@@ -88,10 +87,8 @@ function App() {
   const [session, setSession] = React.useState();
   const [showHistoryclosed, setShowHistoryclosed] = React.useState(false);
   const [sessionChatURL, setSessionChatURL] = React.useState(null);
-  const [sessionSDLCChatURL, setSessionSDLCChatURL] = React.useState(null);
   const [sessionName, setSessionName] = React.useState(null);
   const [updateChatHistory, setUpdateChatHistory] = React.useState(0);
-  const [updateSDLCChatHistory, setUpdateSDLCChatHistory] = React.useState(0);
   const [domain, setDomain] = React.useState(DOMAIN);
   const [allowed, setAllowed] = React.useState(false);
   const [domainAllias, setDomainAllias] = React.useState(false);
@@ -115,18 +112,21 @@ function App() {
   const [resetMetaTags, setResetMetaTags] = React.useState(false);
   const [visibleSupportBot, setVisibleSupportBot] = React.useState(false);
   const [isFileUploaded, setIsFileUploaded] = React.useState(false);
- 
+  const [sessions, setSessions] = React.useState([]);
+  const [thesessionID, setTheSessionID] = useState(null);
+
+
   let auth_response = null;
- 
+
   let autoReplace = [];
   let tempGlobalText = [];
   let tempAlliasName = "";
- 
+
   const updateConfigFiles = callback => {
     dashboardMap.USECASES.map((key, index) => {
       try {
         getDataFromAppService(key, data => {
-          if (dashboardMap.USECASES.length - 1 == index) {
+          if (dashboardMap.USECASES.length - 1 === index) {
             if (callback) callback();
           }
         });
@@ -135,7 +135,7 @@ function App() {
       }
     });
   }
- 
+
   const getEnvironmentJSON = callback => {
     axios.get('./environment.json')
       .then((response) => {
@@ -152,7 +152,7 @@ function App() {
                 "delete": typeof responseData.DELETE != "undefined" ? JSON.parse(responseData.DELETE) : false,
                 "download": typeof responseData.SHOW_DOWNLOAD != "undefined" ? JSON.parse(responseData.SHOW_DOWNLOAD) : false
               };
- 
+
               try {
                 config["sideBar"] = typeof responseData.SHOW_SIDEBAR != "undefined" ? JSON.parse(responseData.SHOW_SIDEBAR) : false;
                 config["showCode"] = typeof responseData.SHOW_CODE != "undefined" ? JSON.parse(responseData.SHOW_CODE) : false;
@@ -161,22 +161,22 @@ function App() {
                 config["basicModeOptions"] = responseData["BASICMODEOPTIONS"] ?? [];
                 config["advModeOptions"] = responseData["ADVMODEOPTIONS"] ?? [];
               } catch (error) {
- 
+
               }
- 
+
               baseURL = responseData.BASE_URL;
               authURL = 'https://' + window.location.hostname + '/.auth/me';
               tempAlliasName = responseData.ALLIAS;
               setAlliasName(tempAlliasName);
- 
-              if (domain.length == 0) {
+
+              if (domain.length === 0) {
                 dashboardMap.USECASES.map((value, index) => {
-                  if (value.USECASE == USECASE) {
+                  if (value.USECASE === USECASE) {
                     window.location.href = window.location.origin + `/${value.USECASE}?domain=${value.DEFAULT_DOMAIN}`;
                   }
                 })
               }
- 
+
               try {
                 checkAndSetAutoReplace(responseData.AUTO_REPLACE_REF, () => {
                   if (callback) callback();
@@ -184,7 +184,7 @@ function App() {
               } catch (exc) {
                 console.log('USECASE/ENVIRONMENT SET AUTO COMPLETE DATA ERROR');
               }
- 
+
               //if (callback) callback();
             });
           }, true);
@@ -195,7 +195,7 @@ function App() {
       .catch(error => {
         setError(1);
         console.log('ENVIROMENT FILE NOT FOUND!');
- 
+
         try {
           processAutoReplace(tempGlobalText, autoReplace, data => {
             setGlobalUiText(data);
@@ -205,7 +205,7 @@ function App() {
         }
       });
   }
- 
+
   const getDomainStaticText = () => {
     if (USECASE != "cdi") return;
     axios.get('./' + USECASE.toLowerCase() + '_label.json')
@@ -216,7 +216,7 @@ function App() {
         console.log('USE CASE SPECIFIC STATIC TEXT FILE NOT FOUND!');
       });
   }
- 
+
   const getTranslationHubStaticText = () => {
     axios.get('./tranaslationHub.json')
       .then((response) => {
@@ -226,8 +226,7 @@ function App() {
         console.log('USE CASE SPECIFIC STATIC TEXT FILE NOT FOUND!');
       });
   }
- 
- 
+
   const getAppConfigResponse = async (data) => {
     let responseData = data;
     let appConfigData = getGlobalConfigResponse;
@@ -322,7 +321,7 @@ function App() {
     }
     setUIText(responseData);
   }
- 
+
   const getDomainJSON = callback => {
     axios.get('./domain.json')
       .then((response) => {
@@ -330,8 +329,8 @@ function App() {
           resdata.AUTO_REPLACE_REF = updateReplaceVariables(response.data.AUTO_REPLACE_REF, response.data.AUTO_REPLACE_REF);
           getDataFromAppService(resdata, async data => {
             let responseData = data;
-            let validHyperLinkText = responseData.AUTO_REPLACE_REF.filter(item => item.TYPE == "HYPERLINK_CHAT" && item.DISPLAY_TEXT == undefined && item.REDIRECT_LINK == undefined);
-            let validMailIdText = responseData.AUTO_REPLACE_REF.filter(item => item.TYPE == "HYPERLINK_MAIL" && item.DISPLAY_TEXT == undefined && item.REDIRECT_LINK == undefined);
+            let validHyperLinkText = responseData.AUTO_REPLACE_REF.filter(item => item.TYPE === "HYPERLINK_CHAT" && item.DISPLAY_TEXT === undefined && item.REDIRECT_LINK === undefined);
+            let validMailIdText = responseData.AUTO_REPLACE_REF.filter(item => item.TYPE === "HYPERLINK_MAIL" && item.DISPLAY_TEXT === undefined && item.REDIRECT_LINK === undefined);
             if (validHyperLinkText.length > 0 || validMailIdText.length > 0) {
               await getAppConfigResponse(responseData);
             } else {
@@ -368,7 +367,7 @@ function App() {
             } catch (exc) {
               console.log('DOMAIN SET AUTO COMPLETE DATA ERROR');
             }
- 
+
             try {
               processAutoReplace(tempGlobalText, autoReplace, data => {
                 setGlobalUiText(data);
@@ -378,7 +377,7 @@ function App() {
             } catch (exc) {
               console.log('DOMAIN STATIC AUTO REPLACE ERROR', exc);
             }
- 
+
             try {
               const prompt = JSON.parse(responseData.PROMPT);
               setPromptQuest([...promptQuest, ...prompt.QUESTIONS]);
@@ -390,7 +389,7 @@ function App() {
       })
       .catch(error => {
         console.log('DOMAIN SPECIFIC STATIC TEXT FILE NOT FOUND!');
- 
+
         try {
           processAutoReplace(tempGlobalText, autoReplace, data => {
             console.log(globalUiText);
@@ -402,8 +401,10 @@ function App() {
         }
       });
   }
- 
- 
+
+
+  console.log("theSession", thesessionID)
+  console.log("userEmail",userEmail)
   // Function to dynamically create name and description fields
   const populate_dashboardMapFields = (usecase) => {
     return {
@@ -412,7 +413,7 @@ function App() {
       "DEFAULT_DOMAIN": `_UI_${usecase.toUpperCase()}_COMMON_DEFAULT_DOMAIN`,
     };
   };
- 
+
   const getGlobalJSON = (callback) => {
     axios.get('./global.json')
       .then((response) => {
@@ -427,15 +428,15 @@ function App() {
             usecaseObj.DESCRIPTION = DESCRIPTION;
             usecaseObj.DEFAULT_DOMAIN = DEFAULT_DOMAIN;
           });
- 
+
           dataPrivacyURL = response.data.DATA_PRIVACY_URL
- 
+
           processAutoReplace(data, response.data.AUTO_REPLACE_REF, resdata => {
             let responseData = resdata;
- 
+
             tempGlobalText = responseData;
             setGlobalUiText(responseData);
- 
+
             try {
               checkAndSetAutoReplace(responseData.AUTO_REPLACE_REF, () => {
                 if (callback) callback();
@@ -443,15 +444,15 @@ function App() {
             } catch (exc) {
               console.log('GLOBAL SET AUTO COMPLETE DATA ERROR', exc);
             }
- 
+
           });
- 
+
         });
       })
       .catch(error => {
         setError(1);
         console.log('GLOBAL STATIC TEXT FILE NOT FOUND!');
- 
+
         try {
           processAutoReplace(globalUiText, autoReplace, data => {
             setGlobalUiText(data);
@@ -461,20 +462,20 @@ function App() {
         }
       });
   }
- 
+
   const updateReplaceVariables = (autoReplace, autoReplaceRef) => {
     autoReplace.map((key, index) => {
       let res = { ...key };
       delete res.ELEMENT;
- 
+
       processAutoReplace(res, autoReplaceRef, resdata => {
         autoReplace[index] = { ...key, ...resdata };
       }, true)
     });
- 
+
     return autoReplace;
   }
- 
+
   const getDataFromAppService = (response, callback) => {
     let looped = 0;
     for (const [key, value] of Object.entries(response)) {
@@ -511,49 +512,50 @@ function App() {
       }
     }
   }
- 
+
   const checkAndSetAutoReplace = (params, callback) => {
     let aReplace = [...autoReplace];
- 
+
     if (!params) {
       if (callback) callback();
       return;
     }
- 
-    if (autoReplace.length == 0) {
+
+    if (autoReplace.length === 0) {
       autoReplace = [...params];
       if (callback) callback();
       return;
     }
- 
+
     aReplace.map((key, index) => {
       let el = key.ELEMENT;
- 
+
       params.map((k, i) => {
         if (k.ELEMENT == el) {
           aReplace[index] = k;
         }
       });
- 
-      if (aReplace.length - 1 == index) {
+
+      if (aReplace.length - 1 === index) {
         if (callback) callback();
       }
+      return el 
     });
- 
+
     autoReplace = aReplace;
   }
- 
+
   const processAutoReplace = (resp, autoReplaceMap, callback, skipAllias) => {
     const response = resp;
- 
+
     let processed = {};
- 
+
     const processData = value => {
       let data = value;
       autoReplaceMap.map((key, index) => {
         let el = key.ELEMENT;
- 
-        if (key.TYPE == "HYPERLINK") {
+
+        if (key.TYPE === "HYPERLINK") {
           let rLink = key.REDIRECT_LINK;
           let dText = key.DISPLAY_TEXT;
           if (rLink) {
@@ -612,20 +614,20 @@ function App() {
           }
         }
       });
- 
+
       return data;
     }
- 
+
     for (const [key, value] of Object.entries(response)) {
       if (key !== "AUTO_REPLACE_REF") {
         processed[key] = processData(value);
       }
     }
- 
+
     if (callback) callback(processed);
   }
- 
- 
+
+
   React.useEffect(() => {
     getUserEmailID((response) => {
       const usrEmail = response.data[0].user_id;
@@ -655,23 +657,22 @@ function App() {
         },
         (err) => {
           console.error("Failed to run:", err);
-          window.location.reload();
+          // window.location.reload();
         }
       )
     });
- 
+
   }, []);
- 
+
   React.useEffect(() => {
     if (loaded && initLoad) {
       if (allowed) {
         createSession();
         createTranaslationSession();
-        createSDLCSession();
       }
     }
   }, [loaded]);
- 
+
   React.useEffect(() => {
     if (sessionList.length) {
       if (activeSessionID && sessionIndex != 0) {
@@ -694,7 +695,7 @@ function App() {
       }
     }
   }, [sessionList]);
- 
+
   React.useEffect(() => {
     if (sessionTranaslationList.length) {
       if (activeSessionID && sessionIndex != 0) {
@@ -717,13 +718,13 @@ function App() {
       }
     }
   }, [sessionTranaslationList]);
- 
- 
+
+
   React.useEffect(() => {
     if (error !== 0) setLoaded(true);
- 
+
   }, [error]);
- 
+
   React.useEffect(() => {
     if (domainList.length) {
       let list = {};
@@ -743,17 +744,20 @@ function App() {
       }
     }
   }, [domainList]);
+  
   //FOR NEW SESSION ON LAUNCH IN PRODUCTION
   React.useEffect(() => {
     if (!loadDashboard && allowed) {
       getSessions();
-      getTranaslationSessions();
+      // getTranaslationSessions();
+      getSessionsSDLC();
+
     }
   }, [allowed]);
- 
+
   //GET: User Email ID
   const getUserEmailID = (callback) => {
- 
+
     API.GET_AUTH(
       prodMode ? 'https://' + window.location.hostname + '/.auth/me' : './sample_auth.json',
       (response) => {
@@ -766,7 +770,7 @@ function App() {
       }
     )
   }
- 
+
   const authenicateUser = () => {
     if (loadDashboard) {
       setLoaded(true);
@@ -779,18 +783,24 @@ function App() {
       }
     }
   }
- 
- 
+
+
   //GET: Session List
   const getSessions = () => {
     let aSessions = [];
     setResetState(false);
-    API.GET(
+     const formData = new FormData();
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+    API.POST(
       baseURL,
-      'user?user_email=' + `${userEmail}` + '&domain=' + domain,
+      `user`,
+      formData,
       (response) => {
         if (response.data.length) {
           response.data.map((session, index) => {
+          console.log("Getresponse", getSessionsSDLC)
+
             if (config.groupBy) {
               if (session.timestamp != null) {
                 aSessions.push(session);
@@ -820,7 +830,54 @@ function App() {
       }
     )
   }
- 
+
+  const getSessionsSDLC = () => {
+  let aSessions = [];
+  setResetState(false);
+
+  const formData = new FormData();
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+
+  API.POST(
+    "/user",  
+    formData,
+    (response) => {
+      if (response.data.length) {
+        response.data.map((session, index) => {
+          console.log("Getresponse", thesessionID);
+
+          if (config.groupBy) {
+            if (session.timestamp != null) {
+              aSessions.push(session);
+            }
+          } else {
+            if (session.timestamp != null) {
+              aSessions.push(session);
+            } else {
+              let _thisSession = session;
+              _thisSession.timestamp = new Date();
+              aSessions.push(_thisSession);
+            }
+          }
+        });
+        if (difference(sessionList, reverseArr(aSessions))) setSessionList(reverseArr(aSessions));
+      } else {
+        setSessionList([]);
+        if (allowed) {
+          createSession();
+          setLoaded(true);
+        }
+      }
+    },
+    (error) => {
+      console.log(error);
+      setLoaded(true);
+    }
+  );
+};
+
+
   //GET: Session List tranaslation hub
   const getTranaslationSessions = () => {
     let aSessions = [];
@@ -860,8 +917,8 @@ function App() {
       }
     )
   }
- 
- 
+
+
   //Initiate New Session
   const createSession = () => {
     setSessionChatURL(null);
@@ -872,13 +929,34 @@ function App() {
     setResetState(true);
     setResetMetaTags(true)
   }
- 
+
   const handleResetMetaTag = () => {
     setResetMetaTags(false);
   };
- 
- 
-  //Initiate New Translation Hub Session
+
+
+  const createSessionSDLC = (callback) => {
+  const formData = new FormData();
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+
+  try {
+    const response =  API.POST("/user", formData);
+    console.log("myData",response)
+
+    const newSession = response?.data;
+    if (newSession) {
+      setSessions((prev) => [...prev, newSession]);        
+      setCurrentSession(newSession);                   
+      if (callback) callback(newSession);                    
+    }
+  } catch (error) {
+    console.error("Failed to create session:", error);
+  }
+};
+
+
+  //Initiate New Session
   const createTranaslationSession = () => {
     if (isTranslationDone) {
       deleteTranaslationHubSession(getHubSessionId);
@@ -895,19 +973,7 @@ function App() {
     setSessionName("");
     setSessionTimeOutMsg("");
   }
- 
-  //Initiate New SDLC Session
-  const createSDLCSession = () => {
-    setSessionSDLCChatURL(null);
-    sessionIndex = null;
-    sessionID = null;
-    setUpdateSDLCChatHistory(Math.random());
-    setInitLoad(false);
-    setResetState(true);
-  }
- 
- 
- 
+
   //POST: Add a session
   const addNewSession = (callback) => {
     API.POST(
@@ -927,7 +993,64 @@ function App() {
       }
     )
   }
- 
+
+  //POST: Add a session using FormData
+//   const addNewSessionSDLC = (callback) => {
+//   const formData = new FormData();
+//   formData.append("user_email", userEmail);
+//   formData.append("domain", domain);
+
+//   API.POST(
+//     baseURL,
+//     'user', 
+//     formData,
+//     (response) => {
+//       console.log("addNewSessionSDLC response", response)
+//       sessionID = response.data.session_id || response.data.user_session_id;
+//       const createdSessionID = sessionID
+//       console.log("sessionID" , sessionID)
+//       sessionIndex = 0;
+//       if (callback) callback('user/' + sessionID + '?user_email=' + `${userEmail}`, () => {
+//         getSessionsSDLC();
+//       });
+//     },
+//     (error) => {
+//       setLoaded(true);
+//       console.log(error);
+//     }
+//   );
+// }
+
+const addNewSessionSDLC = (callback) => {
+  const formData = new FormData();
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+
+  API.POST(
+    baseURL,
+    'user', 
+    formData,
+    (response) => {
+      console.log("addNewSessionSDLC response", response);
+      const createdSessionId = response.data.user_session_id ;
+      sessionID = createdSessionId; 
+      setTheSessionID(sessionID)
+      sessionIndex = 0;
+      setSessionList(prev=>[...prev,response.data.timestamp])
+      if (callback) callback(createdSessionId);
+    },
+    (error) => {
+      setLoaded(true);
+      console.log(error);
+    }
+  );
+};
+
+
+console.log( "theSession", thesessionID)
+console.log("userKa", userEmail)
+
+
   //POST: Rename a Session
   const renameSession = (session_name, session_ID) => {
     const data = {
@@ -954,7 +1077,7 @@ function App() {
       }
     )
   }
- 
+
   //POST: Rename a Session of Tranaslation hub
   const renameTranaslationHubSession = (session_name, session_ID) => {
     const data = {
@@ -983,8 +1106,37 @@ function App() {
       }
     )
   }
- 
-//POST: Delete a Session
+
+// using FormData
+const renameSessionSDLC = (session_name, thesessionID) => {
+  const formData = new FormData();
+  formData.append("user_session_name", session_name);
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+
+  setLoaded(false);
+  API.POST(
+    baseURL,
+    `user/${thesessionID}/rename`, 
+    formData,
+    (response) => {
+      toast.success(globalUiText.SESSION_RENAME, {
+        position: toast.POSITION.TOP_RIGHT,
+        hideProgressBar: true,
+        autoClose: 2000,
+        closeButton: false
+      });
+      getSessionsSDLC();
+      setLoaded(true);
+    },
+    (error) => {
+      console.log(error);
+      setLoaded(true);
+    }
+  );
+}
+
+  //POST: Delete a Session
   const deleteSession = (session_ID) => {
     if (!config.delete) {
       toast.warning(globalUiText.DELETE_ENABLE_WARNING, {
@@ -1015,7 +1167,7 @@ function App() {
       }
     )
   }
- 
+
   //POST: Delete a Session of Tranaslation hub
   const deleteTranaslationHubSession = (session_ID) => {
     if (!config.delete) {
@@ -1047,7 +1199,47 @@ function App() {
       }
     )
   }
- 
+
+  //POST: Delete a Session using FormData
+  const deleteSessionSDLC = (thesessionID) => {
+  if (!config.delete) {
+    toast.warning(globalUiText.DELETE_ENABLE_WARNING, {
+      position: toast.POSITION.TOP_RIGHT,
+      hideProgressBar: true,
+      autoClose: 2000,
+      closeButton: false
+    });
+    return;
+  }
+
+  setLoaded(false);
+
+  const formData = new FormData();
+  formData.append("user_email", userEmail);
+  formData.append("domain", domain);
+  formData.append("session_id", thesessionID);
+
+  API.DELETE(
+    baseURL,
+    'user',         
+    formData,       
+    (response) => {
+      toast.success(globalUiText.SESSION_DELETE_SUCCESS, {
+        position: toast.POSITION.TOP_RIGHT,
+        hideProgressBar: true,
+        autoClose: 2000,
+        closeButton: false
+      });
+      getSessionsSDLC();  
+      setLoaded(true);
+    },
+    (error) => {
+      console.log(error);
+      setLoaded(true);
+    }
+  );
+};
+
   //POST: Feedback Change
   const onRateChange = (rating) => {
     const rateValue = rating.rating ? 'Up' : 'Down';
@@ -1072,9 +1264,9 @@ function App() {
       }
     )
   }
- 
- 
- 
+
+
+
   //POST: Upload files
   const uploadFile = (file, callback) => {
     const formData = new FormData();
@@ -1138,7 +1330,7 @@ function App() {
       )
     }
   }
- 
+
   //POST: Validate User
   const validateUser = async (p_Auth_Str, callback) => {
     if (USECASE && USECASE.toUpperCase() === "CAS") {
@@ -1165,8 +1357,8 @@ function App() {
     // if (USECASE == "supportbot") {
     //   baseURL = "https://emtech-wabackend-blp-all-poc.azurewebsites.net/";
     // }
- 
-    let data;
+
+   let data;
  
     if (USECASE && USECASE.toUpperCase() === "SDLC") {
       data = new FormData();
@@ -1181,7 +1373,7 @@ function App() {
         user_email: p_Auth_Str[0].user_id
       };
     }
- 
+
     API.POST(
       baseURL,
       'user/active_directory/validate',
@@ -1225,7 +1417,7 @@ function App() {
       }
     );
   }
- 
+
   const checkValidUseCase = () => {
     if (typeof dashboardMap.USECASES != "undefined") {
       let validUseCase = false;
@@ -1241,14 +1433,14 @@ function App() {
       }
     }
   }
- 
+
   const shorthandUserEmail = () => {
     const userFullName = userEmail.split('@')[0],
       userName = userFullName.split('.')[0],
       userSurname = userFullName.split('.')[userFullName.split('.').length - 1];
     return userName.charAt(0).toUpperCase() + '' + (userFullName.split('.').length > 1 ? userSurname.charAt(0).toUpperCase() : "");
   }
- 
+
   const reverseArr = (input) => {
     var ret = new Array;
     for (var i = input.length - 1; i >= 0; i--) {
@@ -1256,19 +1448,46 @@ function App() {
     }
     return ret;
   }
- 
+
   const setCurrentSession = (index) => {
     sessionIndex = index ? index : 0;
     try {
       sessionID = sessionList[sessionIndex].user_session_id;
       setSessionName(sessionList[sessionIndex].user_session_name.split('"').join(''));
-      setSessionChatURL(baseURL + 'chat/' + sessionID + '?user_email=' + `${userEmail}`);
+      setSessionChatURL(baseURL + "/user");
       setSession(sessionList[sessionIndex]);
     } catch (exc) {
       console.log(exc);
     }
   }
- 
+
+//   const setCurrentSessionSDLC = async (index) => {
+//   const selectedIndex = index !== undefined && index !== null ? index : 0;
+//   sessionIndex = selectedIndex;
+
+//   try {
+//     const selectedSession = sessionList[sessionIndex];
+//     sessionID = selectedSession.user_session_id;
+//     const sessionNameCleaned = selectedSession.user_session_name.split('"').join('');
+
+//     setSessionName(sessionNameCleaned);
+//     setSessionChatURL(`${baseURL}/${sessionID}?user_email=${userEmail}`);
+//     setSession(selectedSession);
+
+//     // Create and send FormData
+//     const formData = new FormData();
+//     formData.append("user_email", userEmail);
+//     formData.append("domain", domain); 
+//     formData.append("session_id", sessionID);
+
+//     API.POST("/user/", formData);
+
+//   } catch (err) {
+//     console.log("Error in setCurrentSession:", err);
+//   }
+// };
+
+
   const setTranasltionCurrentSession = (index) => {
     sessionIndex = index ? index : 0;
     try {
@@ -1281,10 +1500,10 @@ function App() {
       console.log(exc);
     }
   }
- 
+
   const difference = (arrayOne, arrayTwo) => {
     let differenceFound = false;
-    if (arrayOne.length == arrayTwo.length) {
+    if (arrayOne.length === arrayTwo.length) {
       arrayOne.map((session, index) => {
         if (session.user_session_name.split('"').join('') != arrayTwo[index].user_session_name.split('"').join('')) {
           if (!differenceFound) differenceFound = true;
@@ -1293,20 +1512,20 @@ function App() {
     } else {
       differenceFound = true;
     }
- 
+
     return differenceFound;
   }
- 
+
   const showHistory = () => {
     setShowHistoryclosed(!showHistoryclosed);
   }
- 
- 
+
+
   const showTranasltionHistory = () => {
     setShowHistoryTranaslationclosed(!showHistoryTranaslationclosed);
   }
- 
- 
+
+
   const setURIDomain = (value) => {
     var re = new RegExp("([?&])" + 'domain' + "=.*?(&|$)", "i");
     var separator = window.location.href.indexOf('?') !== -1 ? "&" : "?";
@@ -1314,50 +1533,50 @@ function App() {
       window.location = window.location.href.replace(re, '$1' + 'domain' + "=" + value + '$2');
     }
     else {
-      window.location = window.location.href + separator + 'domain' + "=" + value;
+      window.location = window.location.href + separator + "domain" + "=" + value;
     }
   }
- 
+
   const [subFeature, setSubFeature] = useState(kChart);
- 
+
   const handleSubFeatureSelection = (selectedFeature) => {
     setSubFeature(selectedFeature)
     let heading = "Chat"
-    if (selectedFeature == kChart) {
+    if (selectedFeature === kChart) {
       if (sessionList > 0) {
         setCurrentSession(sessionIndex ?? 0);
       }
       heading = staticText["CHAT_SECTION_LABEL"]
       toast.dismiss()
-    } else if (selectedFeature == kDiscover) {
+    } else if (selectedFeature === kDiscover) {
       setSessionName("");
       heading = staticText["DISCOVER_LABEL"]
-    } else if (selectedFeature == kInsights) {
+    } else if (selectedFeature === kInsights) {
       setSessionName("");
       heading = staticText["INSIGHTS_LABEL"]
       toast.dismiss()
-    } else if (selectedFeature == kModelling) {
+    } else if (selectedFeature === kModelling) {
       setSessionName("");
       heading = staticText["MODELLING_LABEL"]
       toast.dismiss()
-    } else if (selectedFeature == kTranaslationHub) {
+    } else if (selectedFeature === kTranaslationHub) {
       setTranasltionCurrentSession(sessionIndex ?? 0);
       heading = staticText["TRANASLATION_HUB_LABEL"]
       toast.dismiss()
     }
- 
+
     setUIText({
       ...uiText,
       CHAT_LABEL: heading
     })
   }
- 
+
   const onAcknowledge = (callback) => {
     const data = {
       "user_email": userEmail,
       "domain": DOMAIN
     }
- 
+
     API.POST(
       dataPrivacyURL,
       'user/privacy_statement/sign',
@@ -1378,9 +1597,9 @@ function App() {
       }
     );
   }
- 
- 
-const uploadFileHub = async (file, isGlossary, callback) => {
+
+
+  const uploadFileHub = async (file, isGlossary, callback) => {
     if (getHubSessionId == null && USECASE == 'thub') {
       const data = {
         "user_email": userEmail,
@@ -1413,7 +1632,7 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       validateFileUpload(file, isGlossary, callback);
     }
   }
- 
+
   //POST: Rename a Session of Tranaslation hub
   const renameHubTranaslationSession = (session_name, session_ID) => {
     const data = {
@@ -1436,7 +1655,14 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       }
     )
   }
- 
+  
+
+
+
+
+
+
+
   const validateFileUpload = async (file, isGlossary, callback) => {
     setLoaded(false);
     if (isGlossary) {
@@ -1531,13 +1757,13 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       )
     }
   }
- 
- 
+
+
   const normalizeFilename = (str) => {
     return str.replace(/[\s_]+/g, '').toLowerCase().trim();
   };
- 
- 
+
+
   const fileToDeleted = (filenameToDelete) => {
     let updatedList = getFileUploadedData.filter(item => {
       const filename = item.split('|')[1];
@@ -1558,15 +1784,15 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       setIsFileUploaded(false);
     }
   };
- 
- 
- 
- 
+
+
+
+
   const updateUploadedFile = (data) => {
     getTranaslationUloadedFile = [];
     getTranaslationUloadedFile = data;
   }
- 
+
   const submitTranaslationHub = (data) => {
     setLoaded(false);
     let getExistingFileData = [];
@@ -1586,8 +1812,7 @@ const uploadFileHub = async (file, isGlossary, callback) => {
     const _getDestinationLanguage = data ? data.dest_language : "";
     const commaSeparatedLanguage = _getDestinationLanguage.join(',');
     const _uploadedFile = getExistingFileData;
-    // const commaSeparatedUploadedFile = _uploadedFile.join(',');
-    const commaSeparatedUploadedFile = _uploadedFile.join('|-|');
+    const commaSeparatedUploadedFile = _uploadedFile.join(',');
     if (data.glossary) {
       formDataSet = {
         "user_email": userEmail,
@@ -1638,7 +1863,7 @@ const uploadFileHub = async (file, isGlossary, callback) => {
         setLoaded(true);
         setIsTranslationDone(false);
         setIsFileUploaded(false);
-        if ((error?.message == "Network Error") || (error?.message == "Request failed with status code 504") || (error?.name == "AxiosError") || (error?.response?.data == undefined)) {
+        if ((error?.message == "Network Error") || (error?.message === "Request failed with status code 504") || (error?.name == "AxiosError") || (error?.response?.data == undefined)) {
           let _dataResponse = "Network Error";
           setHubTranaslationData(_dataResponse);
           setSessionTranaslationChatURL(baseURL + 'tranaslation/' + getHubSessionId + '?user_email=' + `${userEmail}`);
@@ -1669,8 +1894,8 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       }
     )
   }
- 
- 
+
+
   //POST: Feedback Change Tranaslation Hub
   const onRateChangeTranaslationHub = (rating) => {
     setLoaded(false);
@@ -1705,8 +1930,8 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       }
     )
   }
- 
- 
+
+
   //POST: Feedback Change Tranaslation Hub
   const onRateChangeTranaslationHubComments = (rating) => {
     setLoaded(false);
@@ -1741,11 +1966,11 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       }
     )
   }
- 
+
   const handleSelectedTagValues = (data) => {
     setSelectedTagValues(data);
   };
- 
+
   const handleSupportBot = (isChecked) => {
     if (isChecked == true) {
       setVisibleSupportBot(false);
@@ -1753,8 +1978,8 @@ const uploadFileHub = async (file, isGlossary, callback) => {
       setVisibleSupportBot(true);
     }
   }
- 
- 
+
+
   return (
     <div className="App">
       <ToastContainer />
@@ -1762,26 +1987,25 @@ const uploadFileHub = async (file, isGlossary, callback) => {
         <div className="chat-container">
           <main className="main">
             {loadDashboard && typeof dashboardMap.USECASES != 'undefined' ? <Dashboard useCases={dashboardMap} uiText={globalUiText}></Dashboard> : <></>}
- 
+
             <Box sx={{ display: "flex", flexDirection: 'column', width: '100%' }}>
               {
                 typeof dashboardMap.USECASES != 'undefined' ? <Header sessionName={sessionName} key={'h-' + sessionName + domainAllias} userName={shorthandUserEmail} setURIDomain={setURIDomain} domain={domain} domainlist={domainList} uiText={uiText} errorType={error} loadDashboard={loadDashboard} useCases={dashboardMap} domainAllias={domainAllias} initLoad={initLoad} globalUiText={globalUiText} metaTagList={metaTagList} selectedTagName={selectedTagName} handleSelectedTagValues={handleSelectedTagValues} selectedTagValues={selectedTagValues} resetMetaTags={resetMetaTags} handleResetMetaTag={handleResetMetaTag} useCaseChatBot={USECASE} handleSupportBot={handleSupportBot}></Header> : <></>
               }
- 
- 
+
               {error ? <Error errorType={error} uiText={globalUiText} domainAllias={domainAllias[DOMAIN]}></Error> : <></>}
- 
+
               <Loader isLoaded={loaded} uiText={globalUiText}></Loader>
               {!loadDashboard && showAck ? <Acknowledge onAcknowledge={onAcknowledge}></Acknowledge> : <></>}
- 
+
               {!loadDashboard &&
- 
+
                 <Box sx={{ display: "flex", flexDirection: 'row', width: '100%', height: 'calc(100% - 151px)' }}>
- 
+
                   {(config?.sideBar ?? false) &&
                     <>
                       <SideBar handleSubFeatureSelection={handleSubFeatureSelection} selectedSubFeature={subFeature} config={config} />
- 
+
                       {subFeature === kChart &&
                         <>
                           <ChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></ChatHistory>
@@ -1799,7 +2023,7 @@ const uploadFileHub = async (file, isGlossary, callback) => {
                       }
                     </>
                   }
-                  {(!(config?.sideBar ?? false) && USECASE == "thub") &&
+                  {(!(config?.sideBar ?? false) && USECASE === "thub") &&
                     <>
                       <TranaslationHubHistory showTranasltionHistory={showHistoryTranaslationclosed} tranaslationSessions={sessionTranaslationList} updateSession={setTranasltionCurrentSession} createSession={createTranaslationSession} renameTranaslationHubSession={renameTranaslationHubSession} deleteTranaslationHubSession={deleteTranaslationHubSession} showHistoryTranaslationHubToggle={showTranasltionHistory} config={config} key={updateTranaslationHistory} sessionIndex={sessionIndex} initLoad={initLoad}></TranaslationHubHistory>
                       <TranaslationHub sessionTranaslationPath={sessionTranaslationURL} showTranasltionHistory={showTranasltionHistory} key={'c-' + sessionTranaslationURL + typeof session != "undefined"} keyRef={'k-' + sessionTranaslationURL + typeof session != "undefined"} createSession={createTranaslationSession} onRate={onRateChangeTranaslationHub} onRateComments={onRateChangeTranaslationHubComments} userName={shorthandUserEmail} getName={getTranaslationSessions} config={config} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} session={sessionTranaslationList[sessionIndex]} addNewSession={addNewSession} getSessionID={getSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} staticTranslationHubText={staticTranslationHubText} getValidateActiveDirectory={getValidateActiveDirectory} isGlossary={isGlossary} uploadFileHub={uploadFileHub} submitTranaslationHub={submitTranaslationHub} hubTranaslationData={hubTranaslationData} getTranaslationUloadedFile={getTranaslationUloadedFile} updateUploadedFile={updateUploadedFile} sessionTimeOutMsg={sessionTimeOutMsg} isFileUploaded={isFileUploaded} fileToDeleted={fileToDeleted}></TranaslationHub>
@@ -1811,26 +2035,26 @@ const uploadFileHub = async (file, isGlossary, callback) => {
                       <Chat sessionChatPath={sessionChatURL} showHistory={showHistory} key={'c-' + sessionChatURL + (typeof session != "undefined" ? typeof session.file_name != 'undefined' ? session.file_name : "" : "")} keyRef={'k-' + sessionChatURL + (typeof session != "undefined" ? typeof session.file_name != 'undefined' ? session.file_name : "" : "")} createSession={createSession} onRate={onRateChange} userName={shorthandUserEmail} getName={getSessions} config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} session={sessionList[sessionIndex]} addNewSession={addNewSession} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} selectedTagName={selectedTagName} handleSelectedTagValues={handleSelectedTagValues} selectedTagValues={selectedTagValues}></Chat>
                     </>
                   }
- 
-                  {/* {(!(config?.sideBar ?? false) && USECASE == "supportbot" && visibleSupportBot) &&
+
+                  {/* {(!(config?.sideBar ?? false) && USECASE === "supportbot" && visibleSupportBot) &&
                     <>
                       <SupportBotVoice config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} userEmail={userEmail}></SupportBotVoice>
                     </>
-                  }
- 
-                  {(!(config?.sideBar ?? false) && USECASE == "supportbot" && !visibleSupportBot) &&
+                  } */}
+
+                  {/* {(!(config?.sideBar ?? false) && USECASE === "supportbot" && !visibleSupportBot) &&
                     <>
                       <SupportBotChat config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} userEmail={userEmail}></SupportBotChat>
                     </>
                   } */}
- 
-                  {(!(config?.sideBar ?? false) && USECASE == "sdlc") &&
-                    <>
-                      <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory>
-                      <SDLCChat config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSDLCSession} session={sessionList[sessionIndex]} addNewSession={addNewSession} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} ></SDLCChat>
-                    </>
-                  }
- 
+
+                   {(!(config?.sideBar ?? false) && USECASE == "sdlc") &&
+                                      <>
+                                        {/* <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory> */}
+                                         <ChatHistory  sessionList={sessionList} showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} userEmail={userEmail} thesessionID={thesessionID}></ChatHistory>
+                                         <SDLCChat    sessionChatPath={sessionChatURL} setSessionList={setSessionList} config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} showHistory={showHistory} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSessionSDLC} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} thesessionID={thesessionID} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} getName={getSessionsSDLC}></SDLCChat> 
+                                      </>
+                                    }
                 </Box>
               }
             </Box>
@@ -1840,529 +2064,5 @@ const uploadFileHub = async (file, isGlossary, callback) => {
     </div>
   );
 }
- 
+
 export default App;
- 
-   <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad}></SDLCChatHistory>
-                                       <SDLCChat config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSession} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} ></SDLCChat>
-
-
-
-
-
-                                       const uploadFileHub = async (file, isGlossary, callback) => {
-    if (getHubSessionId == null && USECASE == 'thub') {
-      const data = {
-        "user_email": userEmail,
-        "domain": DOMAIN
-      }
-      await API.POST(
-        baseURL,
-        'user?user_email=' + `${userEmail}` + '&domain=' + domain,
-        data,
-        (response) => {
-          if (response) {
-            getHubSessionId = response.data ? response.data.user_session_id : null;
-            sessionID = getHubSessionId;
-            if (callback) callback(response);
-            const getFileName = file ? file.name : "";
-            setResetState(false);
-            setSessionTranaslationChatURL(null);
-            renameHubTranaslationSession(getFileName, getHubSessionId);
-            validateFileUpload(file, isGlossary, callback);
-            setIsTranslationDone(true);
-          }
-        },
-        (error) => {
-          if (error) {
-            console.log('error', error);
-          }
-        }
-      );
-    } else {
-      validateFileUpload(file, isGlossary, callback);
-    }
-  }
- 
-  //POST: Rename a Session of Tranaslation hub
-  const renameHubTranaslationSession = (session_name, session_ID) => {
-    const data = {
-      "user_session_name": session_name,
-      "user_email": userEmail,
-      "domain": domain
-    }
-    setLoaded(false);
-    API.POST(
-      baseURL,
-      'user/' + session_ID + '/rename?user_email=' + `${userEmail}` + '&domain=' + domain,
-      data,
-      (response) => {
-        getTranaslationSessions();
-        setLoaded(true);
-      },
-      (error) => {
-        console.log(error);
-        setLoaded(true);
-      }
-    )
-  }
- 
-  const validateFileUpload = async (file, isGlossary, callback) => {
-    setLoaded(false);
-    if (isGlossary) {
-      const formData = new FormData();
-      formData.append('user_email', userEmail);
-      formData.append('user_session_id', getHubSessionId);
-      formData.append('glossary', 'True');
-      formData.append('file', file);
-      formData.append('domain', domain);
-      API.UPLOAD(
-        baseURL,
-        'sourcefile_upload',
-        formData,
-        (response) => {
-          getFileUploadedGlossaryData = response.data.glossary_url;
-          let dataFile = {
-            "file_Name": file ? file.name : "",
-            "file_Url": getFileUploadedGlossaryData,
-            "Glossary": true
-          }
-          getTranaslationUloadedFile.push(dataFile);
-          setResetState(false);
-          setSessionTranaslationChatURL(null);
-          setLoaded(true);
-          toast.success(globalUiText.FILE_UPLOAD_SUCCESS, {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-          if (callback) callback(response);
-          getTranaslationSessions();
-        },
-        (error) => {
-          setResetState(false);
-          setSessionTranaslationChatURL(null);
-          setLoaded(true);
-          toast.error(error.response.data.error, {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-          if (callback) callback(false);
-          console.log(error);
-        }
-      )
-    } else {
-      const formData = new FormData();
-      formData.append('user_email', userEmail);
-      formData.append('user_session_id', getHubSessionId);
-      formData.append('glossary', 'False');
-      formData.append('file', file);
-      formData.append('domain', domain);
-      API.UPLOAD(
-        baseURL,
-        'sourcefile_upload',
-        formData,
-        (response) => {
-          const _getData = response.data.blob_url;
-          getFileUploadedData.push(_getData);
-          let dataFile = {
-            "file_Name": file ? file.name : "",
-            "file_Url": _getData,
-            "Glossary": false
-          }
-          getTranaslationUloadedFile.push(dataFile);
-          setSessionTranaslationChatURL(null);
-          setLoaded(true);
-          setIsFileUploaded(true);
-          toast.success(globalUiText.FILE_UPLOAD_SUCCESS, {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-          if (callback) callback(response);
-          getTranaslationSessions();
-        },
-        (error) => {
-          setSessionTranaslationChatURL(null);
-          setLoaded(true);
-          toast.error(error.response.data.error, {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-          if (callback) callback(false);
-          console.log(error);
-        }
-      )
-    }
-  }
- 
- 
-  const normalizeFilename = (str) => {
-    return str.replace(/[\s_]+/g, '').toLowerCase().trim();
-  };
- 
- 
-  const fileToDeleted = (filenameToDelete) => {
-    let updatedList = getFileUploadedData.filter(item => {
-      const filename = item.split('|')[1];
-      return normalizeFilename(filename) !== normalizeFilename(filenameToDelete);
-    });
-    const seen = new Set();
-    updatedList = updatedList.filter(item => {
-      const filename = item.split('|')[1];
-      const normalized = normalizeFilename(filename);
-      if (seen.has(normalized)) {
-        return false;
-      }
-      seen.add(normalized);
-      return true;
-    });
-    getFileUploadedData = updatedList;
-    if (getFileUploadedData.length === 0) {
-      setIsFileUploaded(false);
-    }
-  };
- 
- 
- 
- 
-  const updateUploadedFile = (data) => {
-    getTranaslationUloadedFile = [];
-    getTranaslationUloadedFile = data;
-  }
- 
-  const submitTranaslationHub = (data) => {
-    setLoaded(false);
-    let getExistingFileData = [];
-    let uniqueFileUploadedData = getFileUploadedData.filter((value, index, self) => self.indexOf(value) === index);
-    let getUniqueTranslationFile = getTranaslationUloadedFile.filter(file => !file.Glossary);
-    if (getUniqueTranslationFile.length != uniqueFileUploadedData.length) {
-      getUniqueTranslationFile.forEach(item => {
-        for (let i = 0; i < uniqueFileUploadedData.length; i++) {
-          if ((item == uniqueFileUploadedData[i]) || (item.file_Url == uniqueFileUploadedData[i])) {
-            getExistingFileData.push(uniqueFileUploadedData[i]);
-          }
-        }
-      });
-    } else {
-      getExistingFileData = uniqueFileUploadedData;
-    }
-    const _getDestinationLanguage = data ? data.dest_language : "";
-    const commaSeparatedLanguage = _getDestinationLanguage.join(',');
-    const _uploadedFile = getExistingFileData;
-    // const commaSeparatedUploadedFile = _uploadedFile.join(',');
-    const commaSeparatedUploadedFile = _uploadedFile.join('|-|');
-    if (data.glossary) {
-      formDataSet = {
-        "user_email": userEmail,
-        "user_session_id": getHubSessionId,
-        "domain": domain,
-        "blob_list": commaSeparatedUploadedFile,
-        "dest_language": commaSeparatedLanguage,
-        "glossary": 'True',
-        "glossary_url": getFileUploadedGlossaryData,
-      }
-    } else {
-      formDataSet = {
-        "user_email": userEmail,
-        "user_session_id": getHubSessionId,
-        "domain": domain,
-        "blob_list": commaSeparatedUploadedFile,
-        "dest_language": commaSeparatedLanguage,
-        "glossary": 'False',
-        "glossary_url": ""
-      }
-    }
-    API.POST(
-      baseURL,
-      'translation_status?user_session_id=' + getHubSessionId,
-      formDataSet,
-      (response) => {
-        let _dataResponse = response?.data;
-        setHubTranaslationData(_dataResponse);
-        setSessionTranaslationChatURL(baseURL + 'tranaslation/' + getHubSessionId + '?user_email=' + `${userEmail}`);
-        setGetSessionID(getHubSessionId);
-        getHubSessionId = null;
-        getTranaslationUloadedFile = [];
-        getFileUploadedData = [];
-        setResetState(false);
-        setLoaded(true);
-        setIsTranslationDone(false);
-        setIsFileUploaded(false);
-        toast.success(globalUiText.FILE_UPLOAD_SUCCESS, {
-          position: toast.POSITION.TOP_RIGHT,
-          hideProgressBar: true,
-          autoClose: 2000,
-          closeButton: false
-        });
-      },
-      (error) => {
-        getHubSessionId = null;
-        setResetState(false);
-        setLoaded(true);
-        setIsTranslationDone(false);
-        setIsFileUploaded(false);
-        if ((error?.message == "Network Error") || (error?.message == "Request failed with status code 504") || (error?.name == "AxiosError") || (error?.response?.data == undefined)) {
-          let _dataResponse = "Network Error";
-          setHubTranaslationData(_dataResponse);
-          setSessionTranaslationChatURL(baseURL + 'tranaslation/' + getHubSessionId + '?user_email=' + `${userEmail}`);
-          setGetSessionID(getHubSessionId);
-          getHubSessionId = null;
-          getTranaslationUloadedFile = [];
-          getFileUploadedData = [];
-          setResetState(false);
-          setLoaded(true);
-          setIsTranslationDone(false);
-          const _msgDisplay = "Network Error";
-          setSessionTimeOutMsg(_msgDisplay);
-          toast.error("The translation is taking longer than expected. Please revisit the session again later or reduce the file size and start a new session.", {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-        } else {
-          toast.error(error?.response?.data?.error, {
-            position: toast.POSITION.TOP_RIGHT,
-            hideProgressBar: true,
-            autoClose: 2000,
-            closeButton: false
-          });
-        }
-        console.log(error);
-      }
-    )
-  }
- 
- 
-  //POST: Feedback Change Tranaslation Hub
-  const onRateChangeTranaslationHub = (rating) => {
-    setLoaded(false);
-    const rateValue = rating.rating ? 'Up' : 'Down';
-    const rateChatId = rating.chatId;
-    const data = {
-      "user_email": userEmail,
-      "domain": domain
-    }
-    API.POST(
-      baseURL,
-      'chat/' + rateChatId + '/Thumbs/' + rateChatId + '?Thumbs=' + rateValue,
-      data,
-      (response) => {
-        setLoaded(true);
-        toast.success("Your feedback has been submitted", {
-          position: toast.POSITION.TOP_RIGHT,
-          hideProgressBar: true,
-          autoClose: 2000,
-          closeButton: false
-        });
-      },
-      (error) => {
-        setLoaded(true);
-        toast.error(error.response.data.error, {
-          position: toast.POSITION.TOP_RIGHT,
-          hideProgressBar: true,
-          autoClose: 2000,
-          closeButton: false
-        });
-        console.log(error);
-      }
-    )
-  }
- 
- 
-  //POST: Feedback Change Tranaslation Hub
-  const onRateChangeTranaslationHubComments = (rating) => {
-    setLoaded(false);
-    const rateChatId = rating.chatId;
-    const thumbsFeedback = rating.thumbs_feedback
-    const data = {
-      "user_email": userEmail,
-      "domain": domain
-    }
-    API.POST(
-      baseURL,
-      'chat/' + rateChatId + '/thumbs_feedback/' + rateChatId + '?thumbs_feedback=' + thumbsFeedback,
-      data,
-      (response) => {
-        setLoaded(true);
-        toast.success("Your feedback has been submitted", {
-          position: toast.POSITION.TOP_RIGHT,
-          hideProgressBar: true,
-          autoClose: 2000,
-          closeButton: false
-        });
-      },
-      (error) => {
-        setLoaded(true);
-        toast.error(error.response.data.error, {
-          position: toast.POSITION.TOP_RIGHT,
-          hideProgressBar: true,
-          autoClose: 2000,
-          closeButton: false
-        });
-        console.log(error);
-      }
-    )
-  }
- 
-  const handleSelectedTagValues = (data) => {
-    setSelectedTagValues(data);
-  };
- 
-  const handleSupportBot = (isChecked) => {
-    if (isChecked == true) {
-      setVisibleSupportBot(false);
-    } else {
-      setVisibleSupportBot(true);
-    }
-  }
- 
- 
-  return (
-    <div className="App">
-      <ToastContainer />
-      <DataInsightsProvider uiConfig={staticText} appConfig={uiText} loaded={setLoaded}>
-        <div className="chat-container">
-          <main className="main">
-            {loadDashboard && typeof dashboardMap.USECASES != 'undefined' ? <Dashboard useCases={dashboardMap} uiText={globalUiText}></Dashboard> : <></>}
- 
-            <Box sx={{ display: "flex", flexDirection: 'column', width: '100%' }}>
-              {
-                typeof dashboardMap.USECASES != 'undefined' ? <Header sessionName={sessionName} key={'h-' + sessionName + domainAllias} userName={shorthandUserEmail} setURIDomain={setURIDomain} domain={domain} domainlist={domainList} uiText={uiText} errorType={error} loadDashboard={loadDashboard} useCases={dashboardMap} domainAllias={domainAllias} initLoad={initLoad} globalUiText={globalUiText} metaTagList={metaTagList} selectedTagName={selectedTagName} handleSelectedTagValues={handleSelectedTagValues} selectedTagValues={selectedTagValues} resetMetaTags={resetMetaTags} handleResetMetaTag={handleResetMetaTag} useCaseChatBot={USECASE} handleSupportBot={handleSupportBot}></Header> : <></>
-              }
- 
- 
-              {error ? <Error errorType={error} uiText={globalUiText} domainAllias={domainAllias[DOMAIN]}></Error> : <></>}
- 
-              <Loader isLoaded={loaded} uiText={globalUiText}></Loader>
-              {!loadDashboard && showAck ? <Acknowledge onAcknowledge={onAcknowledge}></Acknowledge> : <></>}
- 
-              {!loadDashboard &&
- 
-                <Box sx={{ display: "flex", flexDirection: 'row', width: '100%', height: 'calc(100% - 151px)' }}>
- 
-                  {(config?.sideBar ?? false) &&
-                    <>
-                      <SideBar handleSubFeatureSelection={handleSubFeatureSelection} selectedSubFeature={subFeature} config={config} />
- 
-                      {subFeature === kChart &&
-                        <>
-                          <ChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></ChatHistory>
-                          <Chat sessionChatPath={sessionChatURL} showHistory={showHistory} key={'c-' + sessionChatURL + (typeof session != "undefined" ? typeof session.file_name != 'undefined' ? session.file_name : "" : "")} createSession={createSession} onRate={onRateChange} userName={shorthandUserEmail} getName={getSessions} config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} session={sessionList[sessionIndex]} addNewSession={addNewSession} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} selectedTagName={selectedTagName} handleSelectedTagValues={handleSelectedTagValues} selectedTagValues={selectedTagValues}></Chat>
-                        </>
-                      }
-                      {subFeature === kDiscover &&
-                        <Discover sessionID={sessionID ?? `session${Date.now()}`} baseUrl={baseURL} domain={domain} uiText={uiText} errorType={error} userEmail={userEmail} globalUiText={globalUiText} />
-                      }
-                      {subFeature === kInsights &&
-                        <Insights sessionID={sessionID ?? `session${Date.now()}`} baseUrl={baseURL} domain={domain} uiText={uiText} errorType={error} userEmail={userEmail} globalUiText={globalUiText} />
-                      }
-                      {subFeature === kModelling &&
-                        <DataModelling sessionID={sessionID ?? `session${Date.now()}`} baseUrl={baseURL} domain={domain} uiText={uiText} errorType={error} userEmail={userEmail} globalUiText={globalUiText} setSubFeature={handleSubFeatureSelection} />
-                      }
-                    </>
-                  }
-                  {(!(config?.sideBar ?? false) && USECASE == "thub") &&
-                    <>
-                      <TranaslationHubHistory showTranasltionHistory={showHistoryTranaslationclosed} tranaslationSessions={sessionTranaslationList} updateSession={setTranasltionCurrentSession} createSession={createTranaslationSession} renameTranaslationHubSession={renameTranaslationHubSession} deleteTranaslationHubSession={deleteTranaslationHubSession} showHistoryTranaslationHubToggle={showTranasltionHistory} config={config} key={updateTranaslationHistory} sessionIndex={sessionIndex} initLoad={initLoad}></TranaslationHubHistory>
-                      <TranaslationHub sessionTranaslationPath={sessionTranaslationURL} showTranasltionHistory={showTranasltionHistory} key={'c-' + sessionTranaslationURL + typeof session != "undefined"} keyRef={'k-' + sessionTranaslationURL + typeof session != "undefined"} createSession={createTranaslationSession} onRate={onRateChangeTranaslationHub} onRateComments={onRateChangeTranaslationHubComments} userName={shorthandUserEmail} getName={getTranaslationSessions} config={config} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} session={sessionTranaslationList[sessionIndex]} addNewSession={addNewSession} getSessionID={getSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} staticTranslationHubText={staticTranslationHubText} getValidateActiveDirectory={getValidateActiveDirectory} isGlossary={isGlossary} uploadFileHub={uploadFileHub} submitTranaslationHub={submitTranaslationHub} hubTranaslationData={hubTranaslationData} getTranaslationUloadedFile={getTranaslationUloadedFile} updateUploadedFile={updateUploadedFile} sessionTimeOutMsg={sessionTimeOutMsg} isFileUploaded={isFileUploaded} fileToDeleted={fileToDeleted}></TranaslationHub>
-                    </>
-                  }
-                  {(!(config?.sideBar ?? false) && !["thub", "supportbot", "sdlc"].includes(USECASE)) &&
-                    <>
-                      <ChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></ChatHistory>
-                      <Chat sessionChatPath={sessionChatURL} showHistory={showHistory} key={'c-' + sessionChatURL + (typeof session != "undefined" ? typeof session.file_name != 'undefined' ? session.file_name : "" : "")} keyRef={'k-' + sessionChatURL + (typeof session != "undefined" ? typeof session.file_name != 'undefined' ? session.file_name : "" : "")} createSession={createSession} onRate={onRateChange} userName={shorthandUserEmail} getName={getSessions} config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} session={sessionList[sessionIndex]} addNewSession={addNewSession} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} selectedTagName={selectedTagName} handleSelectedTagValues={handleSelectedTagValues} selectedTagValues={selectedTagValues}></Chat>
-                    </>
-                  }
- 
-                  {/* {(!(config?.sideBar ?? false) && USECASE == "supportbot" && visibleSupportBot) &&
-                    <>
-                      <SupportBotVoice config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} userEmail={userEmail}></SupportBotVoice>
-                    </>
-                  }
- 
-                  {(!(config?.sideBar ?? false) && USECASE == "supportbot" && !visibleSupportBot) &&
-                    <>
-                      <SupportBotChat config={config} promptQuest={promptQuest} domain={domain} usecase={USECASE} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} loaded={setLoaded} userEmail={userEmail}></SupportBotChat>
-                    </>
-                  } */}
- 
-                  {(!(config?.sideBar ?? false) && USECASE == "sdlc") &&
-                    <>
-                      <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory>
-                      <SDLCChat config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'chat/' + sessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSDLCSession} session={sessionList[sessionIndex]} addNewSession={addNewSession} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} ></SDLCChat>
-                    </>
-                  }
- 
-                </Box>
-              }
-            </Box>
-          </main>
-        </div>
-      </DataInsightsProvider>
-    </div>
-  );
-}
- 
-export default App;
- 
- 
-https://chatviatris-pilot.azurewebsites.net/.auth/me
-Sign in to your account
- 
-hey 
- 
-in api.service.js
- 
-comment this function ----  API.SDLCDOWNLOAD
- 
-it should work 
- 
-u will get the response once u click the question
- 
-Ok
- 
-API.SDLCDOWNLOAD = (baseURL, path, formData, onSuccess, onError) => {
-  if (API.auth) {
-    getToken(baseURL, (res) => {
-      const headerConfig = getHeaderConfig(res.token);
- 
-      if (headerConfig['User-email']) delete headerConfig['User-email'];
-      if (headerConfig['Domain']) delete headerConfig['Domain'];
- 
-      const postAPI = axios.create({ baseURL });
-      postAPI.post(path, formData, {
-        headers: {
-          ...headerConfig,
-        },
-        responseType: 'arraybuffer', // Important for binary data
-      })
-      .then((res) => {
-        if (onSuccess) onSuccess(res);
-      })
-      .catch((error) => {
-        if (onError) onError(error);
-      });
-    });
-  } else {
- 
-    const postAPI = axios.create({ baseURL });
-    postAPI.post(path, formData, {
-      responseType: 'arraybuffer', // Important for binary data
-    })
-    .then((res) => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch((error) => {
-      if (onError) onError(error);
-    });
-  }
-};
- 
