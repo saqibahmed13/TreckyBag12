@@ -747,10 +747,10 @@ function App() {
   
   //FOR NEW SESSION ON LAUNCH IN PRODUCTION
   React.useEffect(() => {
-    if (!loadDashboard && allowed) {
-      getSessions();
+    if (!loadDashboard || allowed) {
+      // getSessions();
       // getTranaslationSessions();
-      getSessionsSDLC();
+      getSDLCSession();
 
     }
   }, [allowed]);
@@ -785,22 +785,17 @@ function App() {
   }
 
 
-  //GET: Session List
+
+ //GET: Session List
   const getSessions = () => {
     let aSessions = [];
     setResetState(false);
-     const formData = new FormData();
-  formData.append("user_email", userEmail);
-  formData.append("domain", domain);
-    API.POST(
+    API.GET(
       baseURL,
-      `user`,
-      formData,
+      'user?user_email=' + `${userEmail}` + '&domain=' + domain,
       (response) => {
         if (response.data.length) {
           response.data.map((session, index) => {
-          console.log("Getresponse", getSessionsSDLC)
-
             if (config.groupBy) {
               if (session.timestamp != null) {
                 aSessions.push(session);
@@ -831,22 +826,31 @@ function App() {
     )
   }
 
-  const getSessionsSDLC = () => {
-  let aSessions = [];
-  setResetState(false);
+
+
+
+  const getSDLCSession = () => {
+  if (baseURL.startsWith('http://')) {
+    baseURL = baseURL.replace('http://', 'https://');
+  }
+
+  setResetState(false); 
 
   const formData = new FormData();
-  formData.append("user_email", userEmail);
-  formData.append("domain", domain);
+  formData.append('user_email', userEmail);
+  formData.append('domain', domain);
+  // formData.append('session_id', thesessionID); 
 
   API.POST(
-    "/user",  
+    baseURL,
+    '/get_user',
     formData,
     (response) => {
+      console.log('get_user',response)
       if (response.data.length) {
-        response.data.map((session, index) => {
-          console.log("Getresponse", thesessionID);
+        let aSessions = [];
 
+        response.data.map((session, index) => {
           if (config.groupBy) {
             if (session.timestamp != null) {
               aSessions.push(session);
@@ -861,24 +865,31 @@ function App() {
             }
           }
         });
-        if (difference(sessionList, reverseArr(aSessions))) setSessionList(reverseArr(aSessions));
+
+        if (difference(sessionList, reverseArr(aSessions))) {
+          setSessionList(reverseArr(aSessions));
+        }
       } else {
         setSessionList([]);
         if (allowed) {
-          createSession();
+          createSession(); 
           setLoaded(true);
         }
       }
     },
     (error) => {
-      console.log(error);
+      console.error('Error fetching getSessions:', error);
       setLoaded(true);
     }
   );
 };
 
 
+
+
   //GET: Session List tranaslation hub
+  
+  
   const getTranaslationSessions = () => {
     let aSessions = [];
     setResetState(false);
@@ -935,25 +946,28 @@ function App() {
   };
 
 
-  const createSessionSDLC = (callback) => {
-  const formData = new FormData();
-  formData.append("user_email", userEmail);
-  formData.append("domain", domain);
 
-  try {
-    const response =  API.POST("/user", formData);
-    console.log("myData",response)
 
-    const newSession = response?.data;
-    if (newSession) {
-      setSessions((prev) => [...prev, newSession]);        
-      setCurrentSession(newSession);                   
-      if (callback) callback(newSession);                    
-    }
-  } catch (error) {
-    console.error("Failed to create session:", error);
-  }
-};
+
+//   const createSessionSDLC = (callback) => {
+//   const formData = new FormData();
+//   formData.append("user_email", userEmail);
+//   formData.append("domain", domain);
+
+//   try {
+//     const response =  API.POST("/user", formData);
+//     console.log("myData",response)
+
+//     const newSession = response?.data;
+//     if (newSession) {
+//       setSessions((prev) => [...prev, newSession]);        
+//       setCurrentSession(newSession);                   
+//       if (callback) callback(newSession);                    
+//     }
+//   } catch (error) {
+//     console.error("Failed to create session:", error);
+//   }
+// };
 
 
   //Initiate New Session
@@ -984,7 +998,7 @@ function App() {
         sessionID = (response.data.session_id ? response.data.session_id : response.data.user_session_id);
         sessionIndex = 0;
         if (callback) callback('chat/' + sessionID + '?user_email=' + `${userEmail}`, () => {
-          getSessions();
+          // getSessions();
         });
       },
       (error) => {
@@ -994,34 +1008,6 @@ function App() {
     )
   }
 
-  
-
-  //POST: Add a session using FormData
-//   const addNewSessionSDLC = (callback) => {
-//   const formData = new FormData();
-//   formData.append("user_email", userEmail);
-//   formData.append("domain", domain);
-
-//   API.POST(
-//     baseURL,
-//     'user', 
-//     formData,
-//     (response) => {
-//       console.log("addNewSessionSDLC response", response)
-//       sessionID = response.data.session_id || response.data.user_session_id;
-//       const createdSessionID = sessionID
-//       console.log("sessionID" , sessionID)
-//       sessionIndex = 0;
-//       if (callback) callback('user/' + sessionID + '?user_email=' + `${userEmail}`, () => {
-//         getSessionsSDLC();
-//       });
-//     },
-//     (error) => {
-//       setLoaded(true);
-//       console.log(error);
-//     }
-//   );
-// }
 
 const addNewSessionSDLC = (callback) => {
   const formData = new FormData();
@@ -1035,11 +1021,12 @@ const addNewSessionSDLC = (callback) => {
     (response) => {
       console.log("addNewSessionSDLC response", response);
       const createdSessionId = response.data.user_session_id ;
-      sessionID = createdSessionId; 
-      setTheSessionID(sessionID)
+      setTheSessionID(createdSessionId)
       sessionIndex = 0;
       setSessionList(prev=>[...prev,response.data.timestamp])
-      if (callback) callback(createdSessionId);
+      if (callback) callback(createdSessionId, ()=>{
+        getSDLCSession();
+      });
     },
     (error) => {
       setLoaded(true);
@@ -1070,7 +1057,7 @@ console.log("userKa", userEmail)
           autoClose: 2000,
           closeButton: false
         });
-        getSessions();
+        // getSessions();
         setLoaded(true);
       },
       (error) => {
@@ -1128,7 +1115,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
         autoClose: 2000,
         closeButton: false
       });
-      getSessionsSDLC();
+      getSDLCSession();
       setLoaded(true);
     },
     (error) => {
@@ -1160,7 +1147,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
           autoClose: 2000,
           closeButton: false
         });
-        getSessions();
+        // getSessions();
         setLoaded(true);
       },
       (error) => {
@@ -1202,6 +1189,9 @@ const renameSessionSDLC = (session_name, thesessionID) => {
     )
   }
 
+
+
+
   //POST: Delete a Session using FormData
   const deleteSessionSDLC = (thesessionID) => {
   if (!config.delete) {
@@ -1226,7 +1216,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
 
   API.DELETE(
     baseURL,
-    'user',         
+    '/user',         
     formData,       
     (response) => {
       toast.success(globalUiText.SESSION_DELETE_SUCCESS, {
@@ -1235,7 +1225,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
         autoClose: 2000,
         closeButton: false
       });
-      getSessionsSDLC();  
+      getSDLCSession();  
       setLoaded(true);
     },
     (error) => {
@@ -1258,7 +1248,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
       data,
       (response) => {
         toast.success("Your feedback has been submitted", {
-          position: toast.POSITION.TOP_RIGHT,
+          position: toast.POSITION.TOP_RIGHT, 
           hideProgressBar: true,
           autoClose: 2000,
           closeButton: false
@@ -1292,7 +1282,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
               closeButton: false
             });
             if (callback) callback(response);
-            getSessions();
+            // getSessions();
           },
           (error) => {
             toast.error(error.response.data.error, {
@@ -1320,7 +1310,7 @@ const renameSessionSDLC = (session_name, thesessionID) => {
             closeButton: false
           });
           if (callback) callback(response);
-          getSessions();
+          // getSessions();
         },
         (error) => {
           toast.error(error.response.data.error, {
@@ -1459,12 +1449,14 @@ const renameSessionSDLC = (session_name, thesessionID) => {
     try {
       sessionID = sessionList[sessionIndex].user_session_id;
       setSessionName(sessionList[sessionIndex].user_session_name.split('"').join(''));
-      setSessionChatURL(baseURL + "/user");
+      setSessionChatURL(baseURL + 'sdlcChat/' + sessionID + '?user_email=' + `${userEmail}`);
       setSession(sessionList[sessionIndex]);
     } catch (exc) {
       console.log(exc);
     }
   }
+
+  console.log("ChatKAURL", sessionChatURL)
 
 //   const setCurrentSessionSDLC = async (index) => {
 //   const selectedIndex = index !== undefined && index !== null ? index : 0;
@@ -2055,9 +2047,9 @@ const renameSessionSDLC = (session_name, thesessionID) => {
 
                    {(!(config?.sideBar ?? false) && USECASE == "sdlc") &&
                                       <>
-                                        {/* <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory> */}
-                                         <ChatHistory setSessionList={setSessionList} sessionList={sessionList} showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} userEmail={userEmail} thesessionID={thesessionID} domain={domain}></ChatHistory>
-                                         <SDLCChat    sessionChatPath={sessionChatURL} setSessionList={setSessionList} config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} showHistory={showHistory} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSessionSDLC} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} thesessionID={thesessionID} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} getName={getSessionsSDLC} ></SDLCChat> 
+                                        {/* <SDLCChatHistory showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSDLCSession} renameSession={renameSession} showHistoryToggle={showHistory} config={config} key={updateChatHistory} sessionIndex={sessionIndex} deleteSession={deleteSession} initLoad={initLoad}></SDLCChatHistory>   key={updateChatHistory} */}
+                                         <ChatHistory  getSDLCSession={getSDLCSession} key={updateChatHistory} setSessionList={setSessionList} sessionList={sessionList} showHistory={showHistoryclosed} chatSessions={sessionList} updateSession={setCurrentSession} createSession={createSession} renameSession={renameSessionSDLC} showHistoryToggle={showHistory} config={config}  sessionIndex={sessionIndex} deleteSession={deleteSessionSDLC} initLoad={initLoad} baseURL={baseURL}  path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} userEmail={userEmail} thesessionID={thesessionID} domain={domain}></ChatHistory>
+                                         <SDLCChat sessionChatPath={sessionChatURL} setSessionList={setSessionList} config={config} sessionIndex={sessionIndex} initLoad={initLoad} userName={shorthandUserEmail} promptQuest={promptQuest} domain={domain} usecase={USECASE} showHistory={showHistory} dashboardMap={dashboardMap} alliasName={alliasName} uiText={uiText} globalUiText={globalUiText} baseURL={baseURL} path={'/user' + thesessionID + '?user_email=' + `${userEmail}`} loaded={setLoaded} upload={uploadFile} createSession={createSession} session={sessionList[sessionIndex]} addNewSession={addNewSessionSDLC} thesessionID={thesessionID} setActiveSessionID={setActiveSessionID} sessionID={sessionID} resetStates={resetStates} user_email={userEmail} getName={getSDLCSession} ></SDLCChat> 
                                       </>
                                     }
                 </Box>
